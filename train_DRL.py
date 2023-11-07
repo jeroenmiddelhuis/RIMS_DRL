@@ -63,6 +63,7 @@ if __name__ == '__main__':
 
     # Train the agent
     callback = SaveOnBestTrainingRewardCallback(check_freq=int(n_steps), log_dir=log_dir)
+    print(type(time_steps), type(callback))
     model.learn(total_timesteps=int(time_steps), callback=callback)
 
     model.save(f'{log_dir}/_{running_time}_final')

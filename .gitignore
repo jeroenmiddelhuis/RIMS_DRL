@@ -1,1 +1,4 @@
 /tmp
+/_pycache_
+/_output_
+/test.py

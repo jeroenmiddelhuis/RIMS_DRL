@@ -30,6 +30,8 @@ N_TRACES = 10
 NAME = 'output_RL_integration'
 N_SIMULATION = 1
 
+DEBUG_PRINT = False
+
 if __name__ == "__main__":
     warnings.filterwarnings("ignore")
     #run_simulation(PATH_PETRINET, PATH_PARAMETERS, N_SIMULATION, N_TRACES, NAME)
@@ -84,6 +86,10 @@ class gym_env(Env):
     # The agent takes an action based on the current state, and the environment should transition to the next state
     # Take an action at every timestep and evaluate this action in the simulator
     def step(self, action):
+        if DEBUG_PRINT:
+            print('State, action:', self.state, action, self.output[action])
+            print('Outpus', self.output)
+            print('Mask:', self.action_masks())
         # Execute action in simulation
         # Run simulation to next decision moment
         self.simulation_process.set_action_from_RL(self.output[action])
@@ -99,19 +105,29 @@ class gym_env(Env):
         # isTerminated? -> Every step, we should return the status of the simulation
         # If the episode is over, we can reset the environment (def reset())
         isTerminated = False
-        self.state = self.simulation_process.get_state()
+        self.state = self.get_state()
+        if DEBUG_PRINT: print('state after', self.state, '\n')
         return self.state, reward, isTerminated, {}, {}
 
-    # Reset the environment to the initial state -> restart simulation  
+    # Reset the environment -> restart simulation  
     def reset(self, seed=0):
-        # Reinitialize environment?
+        # @Francesca: Please have a look if this is a good way to reset the environment.
+        # The simulation should restart and run until the first decision moment.
+
+        warnings.filterwarnings("ignore")
+        params = Parameters(PATH_PARAMETERS, N_TRACES)
+        self.env = simpy.Environment()
+        self.simulation_process = SimulationProcess(self.env, params)
+        self.env.process(self.setup(self.env, PATH_PETRINET, params, 1, NAME, self.simulation_process))
+
 
         self.state = self.get_state()
         return np.array(self.state), {}
 
     def get_state(self):
         env_state = self.simulation_process.get_state()
-        resource_available = [1.0 if resource in env_state['resource_available'] else 0.0 for resource in self.resources]
+        if DEBUG_PRINT: print(self.env.now, self.simulation_process.get_state())
+        resource_available = [1 if resource in env_state['resource_available'] else 0 for resource in self.resources]
         resource_assigned_to = [0 for _ in range(len(self.resources))]
         for (trace_id, task_type, res) in env_state['actual_assignment']:
             resource_assigned_to[self.resources.index(res)] = (self.task_types.index(task_type) + 1) / len(self.task_types)
