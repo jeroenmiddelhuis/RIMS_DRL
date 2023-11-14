@@ -34,7 +34,11 @@ class Token(object):
         self._parallel_object = parallel_object
         self._buffer = Buffer(writer, values)
         self._buffer.set_feature("attribute_case", custom.case_function_attribute(self._id, time))
-        self._next_activity = None ## next activity to perform for the trace
+        self._trans = self.next_transition() ## next activity to perform for the trace
+        self._next_activity = self._trans.label
+        self._resource_trace = self._process._get_resource_trace()
+
+        self.END = False
 
     def _delete_places(self, places):
         delete = []
@@ -44,111 +48,100 @@ class Token(object):
                     delete.append(p)
         return delete
 
-    def simulation(self, env: simpy.Environment):
+    def inter_trigger_time(self, env, time):
+        yield env.timeout(time)
+        print('TOKEN READY', self._id)
+        self._process.update_tokens_pending(self)
+        self._process._update_state_traces(self._id, env)
+        self.END = True
+
+    def simulation(self, env: simpy.Environment, action): ### action = {task: ... , resource: ....}
         """
             The main function to handle the simulation of a single trace
         """
-        trans = self.next_transition(env)
-        ### register trace in process ###
-        request_resource = None
-        resource_trace = self._process._get_resource_trace(self._id, self._type) #sistemare
-        resource_trace_request = resource_trace.request() if self._type == 'sequential' else None
+        self._process.del_tokens_pending(self._id)
+        if self._prefix.is_empty(): ## no activities already executed
+            self._resource_trace_request = self._resource_trace.request()
 
-        while trans is not None:
-            if not self.see_activity and self._type == 'sequential':
-                yield resource_trace_request
-            if type(trans) == list:
-                yield AllOf(env, trans)
-                am_after = self._parallel_object._get_last_events()
-                for d in self._delete_places(self._am):
-                    del self._am[d]
-                for t in am_after:
-                    self._am[t] = 1
-                trans = self.next_transition(env)
+        self._buffer.reset()
+        self._buffer.set_feature("id_case", self._id)
+        self._buffer.set_feature("activity", action['task'])
+        self._buffer.set_feature("prefix", self._prefix.get_prefix(self._start_time + timedelta(seconds=env.now)))
+        self._buffer.set_feature("attribute_event", custom.event_function_attribute(self._id,
+                                                                                    self._start_time + timedelta(
+                                                              seconds=env.now)))
+        self._buffer.set_feature("wip_wait", 0 if type != 'sequential' else self._resource_trace.count-1)
+        self._buffer.set_feature("wip_wait", self._resource_trace.count)
+        #waiting = self.define_waiting_time(action['task'])
+        #if self._prefix.is_empty():
+        #    yield env.timeout(waiting)
 
-            if trans and trans.label:
-                self._buffer.reset()
-                self._buffer.set_feature("id_case", self._id)
-                self._buffer.set_feature("activity", trans.label)
-                self._next_activity = trans.label
-                self._buffer.set_feature("prefix", self._prefix.get_prefix(self._start_time + timedelta(seconds=env.now)))
-                self._buffer.set_feature("attribute_event", custom.event_function_attribute(self._id,
-                                                                                            self._start_time + timedelta(
-                                                                      seconds=env.now)))
-                self._buffer.set_feature("wip_wait", 0 if type != 'sequential' else resource_trace.count-1)
-                self._buffer.set_feature("wip_wait", resource_trace.count)
+        ### define resource for activity
+        resource = self._process._get_resource(action['resource'])
+        self._buffer.set_feature("ro_single", self._process.get_occupations_single_role(resource._get_name()))
+        self._buffer.set_feature("ro_total", self._process.get_occupations_all_role())
+        self._buffer.set_feature("role", resource._get_name())
 
-                waiting = self.define_waiting_time(trans.label)
-                if self.see_activity:
-                    yield env.timeout(waiting)
+        self._buffer.set_feature("ro_single", self._process.get_occupations_single_role(resource._get_name()))
+        self._buffer.set_feature("ro_total", self._process.get_occupations_all_role())
+        self._buffer.set_feature("role", resource._get_name())
 
-                self._process.update_tokens_pedding(self)
-                self._process.check_resource_available()
+        ### register event in process ###
+        resource_task = self._process._get_resource_event(action['task'])
+        self._buffer.set_feature("wip_activity", resource_task.count)
 
-                assign = yield self._process.store.get(lambda a: a[0] == self._id and a[1] == trans.label)
-
-                ### define resource for activity
-                resource = self._process._get_resource(assign[2])
-                self._buffer.set_feature("ro_single", self._process.get_occupations_single_role(resource._get_name()))
-                self._buffer.set_feature("ro_total", self._process.get_occupations_all_role())
-                self._buffer.set_feature("role", resource._get_name())
-
-                self._buffer.set_feature("ro_single", self._process.get_occupations_single_role(resource._get_name()))
-                self._buffer.set_feature("ro_total", self._process.get_occupations_all_role())
-                self._buffer.set_feature("role", resource._get_name())
-
-                ### register event in process ###
-                resource_task = self._process._get_resource_event(trans.label)
-                self._buffer.set_feature("wip_activity", resource_task.count)
-
-                queue = 0 if len(resource._queue) == 0 else len(resource._queue[-1])
-                self._buffer.set_feature("queue", queue)
-                self._buffer.set_feature("enabled_time", self._start_time + timedelta(seconds=env.now))
+        queue = 0 if len(resource._queue) == 0 else len(resource._queue[-1])
+        self._buffer.set_feature("queue", queue)
+        self._buffer.set_feature("enabled_time", self._start_time + timedelta(seconds=env.now))
 
 
-                request_resource = resource.request()
-                yield request_resource
-                self._process.set_actual_assignment(self._id, trans.label, assign[2])
+        request_resource = resource.request()
+        yield request_resource
+        self._process.set_actual_assignment(self._id, action['task'], action['resource'])
 
-                #single_resource = self._process._set_single_resource(resource._get_name())
-                self._buffer.set_feature("resource", resource._get_name())
+        #single_resource = self._process._set_single_resource(resource._get_name())
+        self._buffer.set_feature("resource", resource._get_name())
 
-                resource_task_request = resource_task.request()
-                yield resource_task_request   #### errore
+        resource_task_request = resource_task.request()
+        yield resource_task_request
+        ### call predictor for processing time
+        self._buffer.set_feature("wip_start", 0)
+        self._buffer.set_feature("ro_single", self._process.get_occupations_single_role(resource._get_name()))
+        self._buffer.set_feature("ro_total", self._process.get_occupations_all_role())
+        self._buffer.set_feature("wip_activity", resource_task.count)
 
-                ### call predictor for processing time
-                self._buffer.set_feature("wip_start", 0)
-                self._buffer.set_feature("ro_single", self._process.get_occupations_single_role(resource._get_name()))
-                self._buffer.set_feature("ro_total", self._process.get_occupations_all_role())
-                self._buffer.set_feature("wip_activity", resource_task.count)
+        #stop = resource.to_time_schedule(self._start_time + timedelta(seconds=env.now))
+        #yield env.timeout(stop)
+        self._buffer.set_feature("start_time", self._start_time + timedelta(seconds=env.now))
+        duration = self.define_processing_time(action['task'])
+        yield env.timeout(duration)
+        self._buffer.set_feature("wip_end", self._resource_trace.count)
+        self._buffer.set_feature("end_time", self._start_time + timedelta(seconds=env.now))
+        self._buffer.print_values()
+        self._prefix.add_activity(action['task'])
+        resource.release(request_resource)
+        self._process._release_single_resource(self._id, resource._get_name(), action['task'])
+        resource_task.release(resource_task_request)
 
-                #stop = resource.to_time_schedule(self._start_time + timedelta(seconds=env.now))
-                #yield env.timeout(stop)
-                self._buffer.set_feature("start_time", self._start_time + timedelta(seconds=env.now))
-                duration = self.define_processing_time(trans.label)
-                yield env.timeout(duration)
-                self._buffer.set_feature("wip_end", resource_trace.count)
-                self._buffer.set_feature("end_time", self._start_time + timedelta(seconds=env.now))
-                self._buffer.print_values()
-                self._prefix.add_activity(trans.label)
-                resource.release(request_resource)
-                self._process.check_resource_available()
-                self._process._release_single_resource(self._id, resource._get_name(), trans.label)
-                resource_task.release(resource_task_request)
+        actual_time = env.now - self._start_trace
+        self._process.update_kpi_trace(self._id, actual_time)
 
-                actual_time = env.now - self._start_trace
-                self._process.update_kpi_trace(self._id, actual_time)
+        self._update_marking(self._trans)
+        if self._am:
+            self._trans = self.next_transition(env)
+            self._next_activity = self._trans.label
+        else:
+            self._trans = None
+            self._next_activity = None
 
-            self._update_marking(trans)
-            trans = self.next_transition(env) if self._am else None
-
-
-        if self._type == 'parallel':
-            self._parallel_object._set_last_events(self._am)
-        if self._type == 'sequential':
-            resource_trace.release(resource_trace_request)
+        if self._trans is None:  ### End of TRACE
+            self._resource_trace.release(self._resource_trace_request)
             total_time = env.now - self._start_trace
             self._process._release_resource_trace(self._id, total_time)
+        else:
+            self._process.update_tokens_pending(self)
+
+        self.END = True
 
     def _get_resource_role(self, activity):
         elements = self._params.ROLE_ACTIVITY[activity.label]
@@ -354,7 +347,16 @@ class Token(object):
         """
         return custom.custom_decision_mining(self._buffer)
 
-    def next_transition(self, env):
+
+    def next_transition(self, env= None):
+        step = self.next_step()
+        while step and step.label is None:
+            step = self.next_step()
+            self._update_marking(step)
+            print('NEXT transition', step)
+        return step
+
+    def next_step(self, env=None):
         """
         Method to define the next activity in the petrinet.
         """
@@ -366,16 +368,4 @@ class Token(object):
         elif len(all_enabled_trans) == 1:
             return all_enabled_trans[0]
         else:
-            if len(self._am) == 1:
-                return self.define_xor_next_activity(all_enabled_trans)
-            else:
-                events = []
-                for token in self._am:
-                    name = token.name
-                    new_am = copy.copy(self._am)
-                    tokens_to_delete = self._delete_tokens(name)
-                    for p in tokens_to_delete:
-                        del new_am[p]
-                    path = env.process(Token(self._id, self._net, new_am, self._params, self._process, self._prefix, "parallel", self._writer, self._parallel_object, self._start_trace, self._buffer._get_dictionary()).simulation(env))
-                    events.append(path)
-                return events
+            return self.define_xor_next_activity(all_enabled_trans)

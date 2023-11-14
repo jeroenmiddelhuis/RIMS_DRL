@@ -8,7 +8,7 @@ from role_simulator import RoleSimulator
 import math
 from parameters import Parameters
 import custom_function as custom
-
+from simpy.events import AnyOf
 
 class SimulationProcess(object):
 
@@ -26,39 +26,27 @@ class SimulationProcess(object):
         self.resources_available = True ### check if there are resource to assign one event
         self.tokens_pending = {} ### dictionary keyv = id_case, element = tokenOBJ
         self.next_assign = None
-        #### ResourceStore
-        self.store = simpy.FilterStore(env, capacity=1)
-        self.store.items = []
-
-        self.ACTION = None
+        #self.tokens_event = {'None': self._env.event()}
 
 
-    def check_resource_available(self, string=None):
-        list_occupations = self.get_occupations_all_role()
-        if len(list_occupations) == sum(list_occupations):
-            print('NOT RESOURCE AVAILABLE', self.tokens_pending)
-        elif len(self.tokens_pending) == 0:
-            pass
-        else:
-            if self.ACTION is not None:
-                ### (resource, task_type) ====> tupla(id_case, next_activity, resource)
-                print('ACTION to execute', self.ACTION)
-                for token in self.tokens_pending:
-                    if token._next_activity == self.ACTION[1]:
-                        id_token = token._id
-                self.next_assign = (id_token, self.ACTION[1], self.ACTION[0])
-                self.ACTION = None
-                self.store.put(self.next_assign)
-                del self.tokens_pending[self.next_assign[0]]
-            #self.next_assign = custom.custom_resource(self.get_state(), self.tokens_pending, self._env.now)
-            #self.store.put(self.next_assign)
-            #del self.tokens_pending[self.next_assign[0]]
 
-    def set_action_from_RL(self, action):
-        self.ACTION = action
+    #def start_token(self, token_id, activity, resource):
+    #    ### in base a cosa mi dice STEP LIBERO LA RISORSA DEL TOKEN
+    #    self.token_handle[token_id]['res'] = resource
+    #    self.token_handle[token_id]['obj'].release(self.token_handle[token_id]['request'])
+    #    print('RELEASE', token_id)
 
-    def update_tokens_pedding(self, token):
+    #def get_resource_RL(self, id):
+    #    return self._get_resource(self.token_handle[id]['res'])
+
+    #def get_token(self, id):
+    #    return self.token_handle[id]['obj']
+
+    def update_tokens_pending(self, token):
         self.tokens_pending[token._id] = token
+
+    def del_tokens_pending(self, id):
+        del self.tokens_pending[id]
 
     def define_single_role(self):
         """
@@ -132,10 +120,11 @@ class SimulationProcess(object):
     def _get_resource_event(self, task):
         return self._resource_events[task]
 
-    def _get_resource_trace(self, id, type):
-        if type == 'sequential':
-            self.traces["ongoing"].append((id, 0))
+    def _get_resource_trace(self):
         return self._resource_trace
+
+    def _update_state_traces(self, id, env):
+        self.traces["ongoing"].append((id, env.now))
 
     def _release_resource_trace(self, id, time):
         tupla = ()

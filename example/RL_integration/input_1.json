@@ -1,0 +1,168 @@
+{
+    "interTriggerTimer": {
+        "type": "distribution",
+        "name": "exponential",
+        "parameters": {
+            "scale": 300
+        }
+    },
+    "resource": {
+        "Sara": {
+            "resources": ["Sara"],
+            "calendar": {
+                "days": [0, 1, 2, 3, 4, 5, 6],
+                "hour_min": 0,
+                "hour_max": 23
+            }
+        },
+        "Mike": {
+            "resources": ["Mike"],
+            "calendar": {
+                "days": [0, 1, 2, 3, 4, 5, 6],
+                "hour_min": 0,
+                "hour_max": 23
+            }
+        },
+        "Sue": {
+            "resources": ["Sue"],
+            "calendar": {
+                "days": [0, 1, 2, 3, 4, 5, 6],
+                "hour_min": 0,
+                "hour_max": 23
+            }
+        },
+        "Pete": {
+            "resources": ["Pete"],
+            "calendar": {
+                "days": [0, 1, 2, 3, 4, 5, 6],
+                "hour_min": 0,
+                "hour_max": 23
+            }
+        }
+    },
+    "processing_time": {
+        "A_SUBMITTED":  {
+            "name": "uniform",
+            "parameters": {
+                "low": 3600,
+                "high": 7200
+            }
+        },
+        "A_PARTLYSUBMITTED": {
+            "name": "uniform",
+            "parameters": {
+                "low": 3600,
+                "high": 7200
+            }
+        },
+        "A_PREACCEPTED":  {
+            "name": "uniform",
+            "parameters": {
+                "low": 3600,
+                "high": 7200
+            }
+        },
+        "A_ACCEPTED":  {
+            "name": "uniform",
+            "parameters": {
+                "low": 3600,
+                "high": 7200
+            }
+        },
+        "A_FINALIZED":  {
+            "name": "uniform",
+            "parameters": {
+                "low": 3600,
+                "high": 7200
+            }
+        },
+        "A_CANCELLED":  {
+            "name": "uniform",
+            "parameters": {
+                "low": 3600,
+                "high": 7200
+            }
+        },
+        "A_DECLINED":  {
+            "name": "uniform",
+            "parameters": {
+                "low": 3600,
+                "high": 7200
+            }
+        },
+        "A_APPROVED":  {
+            "name": "uniform",
+            "parameters": {
+                "low": 3600,
+                "high": 7200
+            }
+        },
+        "A_REGISTERED":  {
+            "name": "uniform",
+            "parameters": {
+                "low": 3600,
+                "high": 7200
+            }
+        },
+        "A_ACTIVATED":  {
+            "name": "uniform",
+            "parameters": {
+                "low": 3600,
+                "high": 7200
+            }
+        }
+    },
+    "probability": {
+        "sfl_Flow_06alo8v": "AUTO",
+        "A_ACCEPTED": "AUTO",
+        "sfl_Flow_0tbbi0w": "AUTO",
+        "A_FINALIZED": "AUTO",
+        "A_PREACCEPTED": "AUTO",
+        "sfl_Flow_1vcn3m1": "AUTO",
+        "A_CANCELLED": 0.33,
+        "A_DECLINED": 0.33,
+        "A_APPROVED": 0.34
+    },
+    "resource_table": [
+        {
+            "role": "Role 1",
+            "task": "A_SUBMITTED"
+        },
+        {
+            "role": "Role 2",
+            "task": "A_PARTLYSUBMITTED"
+        },
+        {
+            "role": "Role 2",
+            "task": "A_PREACCEPTED"
+        },
+        {
+            "role": "Role 1",
+            "task": "A_ACCEPTED"
+        },
+        {
+            "role": "Role 2",
+            "task": "A_FINALIZED"
+        },
+        {
+            "role": "Role 2",
+            "task": "A_CANCELLED"
+        },
+        {
+            "role": "Role 2",
+            "task": "A_DECLINED"
+        },
+        {
+            "role": "Role 2",
+            "task": "A_APPROVED"
+        },
+        {
+            "role": "Role 2",
+            "task": "A_REGISTERED"
+        },
+        {
+            "role": "Role 2",
+            "task": "A_ACTIVATED"
+        }
+    ]
+}

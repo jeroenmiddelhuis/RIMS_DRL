@@ -40,6 +40,8 @@ class Prefix(object):
     def get_prefix(self, time):
         return self._list_activities
 
+    def is_empty(self):
+        return True if len(self._list_activities) == 0 else False
 
 class Buffer(object):
 

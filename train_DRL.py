@@ -39,7 +39,8 @@ if __name__ == '__main__':
     num_cpu = 1
     load_model = False
     postpone_penalty = 0
-    time_steps = 5e7 # Total timesteps
+    #time_steps = 5e7 # Total timesteps
+    time_steps = 5
     n_steps = 51200 # Number of steps for each network update
     # Create log dir
     log_dir = f"./tmp/{int(time_steps)}_{n_steps}/" # Logging training results
@@ -49,12 +50,12 @@ if __name__ == '__main__':
     #print(f'Training agent for {config_type} with {time_steps} timesteps in updates of {n_steps} steps.')
     # Create and wrap the environment
     # Reward functions: 'AUC', 'case_task'
-    env = gym_env()  # Initialize env
+    env_simulator = gym_env()  # Initialize env
 
-    env = Monitor(env, log_dir)
+    env = Monitor(env_simulator, log_dir)
 
     # Create the model
-    model = MaskablePPO(MaskableActorCriticPolicy, env, clip_range=0.1, learning_rate=linear_schedule(3e-4),n_steps=int(n_steps), batch_size=512, gamma=0.999, verbose=1)
+    model = MaskablePPO(MaskableActorCriticPolicy, env_simulator, clip_range=0.1, learning_rate=linear_schedule(3e-4),n_steps=int(n_steps), batch_size=512, gamma=0.999, verbose=1)
 
     #Logging to tensorboard. To access tensorboard, open a bash terminal in the projects directory, activate the environment (where tensorflow should be installed) and run the command in the following line
     # tensorboard --logdir ./tmp/
