@@ -56,12 +56,13 @@ def event_function_attribute(case: int, time: datetime):
     return {}
 
 
-def custom_arrivals_time(case, previous):
+def custom_arrivals_time(case, previous, name_log):
     """
     Function to define a new arrival of a trace. The input parameters are the case id number and the start timestamp of the previous trace.
     For example, we used an AutoRegression model for the *arrivals example*.
     """
-    arrival = pd.read_csv('example/BPI_Challenge_2012_W_Two_TS/inter_arrival_rate.csv')
+    path = './example/' + name_log + '/inter_arrival_rate.csv'
+    arrival = pd.read_csv(path)
     next = datetime.strptime(arrival.loc[case].at["timestamp"], '%Y-%m-%d %H:%M:%S')
     interval = (next - previous).total_seconds()
     return interval

@@ -53,7 +53,7 @@ class gym_env(Env):
             self.FEATURE_ROLE = 'no_all_role'
         self.PATH_PETRINET = './example/' + self.name_log + '/' + self.name_log + '.pnml'
         PATH_PARAMETERS = input_file
-        self.N_TRACES = 1200
+        self.N_TRACES = 159
         self.PATH_LOG = './example/' + self.name_log + '/' + self.name_log + '.xes'
         self.params = Parameters(PATH_PARAMETERS, self.N_TRACES, self.name_log, self.FEATURE_ROLE)
         ### define possible assignments from log
@@ -109,7 +109,7 @@ class gym_env(Env):
         prev = 0
         for i in range(0, self.N_TRACES):
             prefix = Prefix()
-            itime = interval.get_next_arrival(self.env, i)
+            itime = interval.get_next_arrival(self.env, i, self.name_log)
             parallel_object = utility.ParallelObject()
             time_trace = self.env.now
             token = Token(i, net, im, self.params, self.simulation_process, prefix, 'sequential', writer, parallel_object,

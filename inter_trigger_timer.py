@@ -22,7 +22,7 @@ class InterTriggerTimer(object):
             self.params = params.INTER_TRIGGER['parameters']
         self._interval = 0
 
-    def get_next_arrival(self, env, case):
+    def get_next_arrival(self, env, case, name_log):
         """Generate a new arrival from the distribution and check if the new token arrival is inside calendar,
         otherwise wait for a suitable time."""
         next = 0
@@ -35,15 +35,15 @@ class InterTriggerTimer(object):
             else:
                 next = arrival
         elif self._type == 'custom':
-            self._interval += self.custom_arrival(case, self._previous)
+            self._interval += self.custom_arrival(case, self._previous, name_log)
         else:
             raise ValueError('ERROR: Invalid arrival times generator')
         self._previous = self._start_time + timedelta(seconds=self._interval)
         return self._interval
 
-    def custom_arrival(self, case, previous):
+    def custom_arrival(self, case, previous, name_log):
         """
         Call to the custom functions in the file custom_function.py.
         """
-        return custom.custom_arrivals_time(case, previous)
+        return custom.custom_arrivals_time(case, previous, name_log)
 
