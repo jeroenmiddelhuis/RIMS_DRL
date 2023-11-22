@@ -1,0 +1,142 @@
+{
+    "start_timestamp": "2020-08-17 14:42:03",
+    "interTriggerTimer": {
+        "type": "custom"
+    },
+    "resource": {
+        "MNO-000002": {"resources": ["MNO-000002"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "ABC-000001": {"resources": ["ABC-000001"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "GHI-000003": {"resources": ["GHI-000003"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "JKL-000001": {"resources": ["JKL-000001"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "JKL-000002": {"resources": ["JKL-000002"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "GHI-000001": {"resources": ["GHI-000001"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "DEF-000003": {"resources": ["DEF-000003"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "DEF-000001": {"resources": ["DEF-000001"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "JKL-000003": {"resources": ["JKL-000003"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "MNO-000001": {"resources": ["MNO-000001"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "GHI-000002": {"resources": ["GHI-000002"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "DEF-000002": {"resources": ["DEF-000002"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "MNO-000003": {"resources": ["MNO-000003"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}
+    },
+    "processing_time": {
+        "A":  {
+            "name": "custom"
+        },
+        "AA":  {
+            "name": "custom"
+        },
+        "B":  {
+            "name": "custom"
+        },
+        "BB":  {
+            "name": "custom"
+        },
+        "C":  {
+            "name": "custom"
+        },
+        "CC":  {
+            "name": "custom"
+        },
+        "D":  {
+            "name": "custom"
+        },
+        "DD":  {
+            "name": "custom"
+        },
+        "E":  {
+            "name": "custom"
+        },
+        "F":  {
+            "name": "custom"
+        },
+        "G":  {
+            "name": "custom"
+        },
+        "H":  {
+            "name": "custom"
+        },
+        "I":  {
+            "name": "custom"
+        },
+        "J":  {
+            "name": "custom"
+        },
+        "K":  {
+            "name": "custom"
+        },
+        "L":  {
+            "name": "custom"
+        },
+        "M":  {
+            "name": "custom"
+        },
+        "N":  {
+            "name": "custom"
+        },
+        "O":  {
+            "name": "custom"
+        },
+        "P":  {
+            "name": "custom"
+        },
+        "Q":  {
+            "name": "custom"
+        },
+        "R":  {
+            "name": "custom"
+        },
+        "S":  {
+            "name": "custom"
+        },
+        "T":  {
+            "name": "custom"
+        },
+        "U":  {
+            "name": "custom"
+        },
+        "V":  {
+            "name": "custom"
+        },
+        "X":  {
+            "name": "custom"
+        },
+        "Y":  {
+            "name": "custom"
+        },
+        "Z":  {
+            "name": "custom"
+        }
+    },
+    "probability": {
+    },
+    "resource_table": [
+        {
+            "role": "Role 1",
+            "task": "A_SUBMITTED"
+        },
+        {
+            "role": "Role 2",
+            "task": "A_PARTLYSUBMITTED"
+        },
+        {
+            "role": "Role 2",
+            "task": "A_PREACCEPTED"
+        },
+        {
+            "role": "Role 1",
+            "task": "A_ACCEPTED"
+        },
+        {
+            "role": "Role 2",
+            "task": "A_FINALIZED"
+        },
+        {
+            "role": "Role 2",
+            "task": "A_CANCELLED"
+        },
+        {
+            "role": "Role 2",
+            "task": "A_DECLINED"
+        },
+        {
+            "role": "Role 2",
+            "task": "A_APPROVED"
+        },
+        {
+            "role": "Role 2",
+            "task": "A_REGISTERED"
+        },
+        {
+            "role": "Role 2",
+            "task": "A_ACTIVATED"
+        }
+    ]
+}

@@ -16,7 +16,7 @@ import custom_function as custom
 
 class Token(object):
 
-    def __init__(self, id: int, net: pm4py.objects.petri_net.obj.PetriNet, am: pm4py.objects.petri_net.obj.Marking, params: Parameters, process: SimulationProcess, prefix: Prefix, type: str, writer: csv.writer, parallel_object: ParallelObject, time: float, values=None):
+    def __init__(self, id: int, net: pm4py.objects.petri_net.obj.PetriNet, am: pm4py.objects.petri_net.obj.Marking, params: Parameters, process: SimulationProcess, prefix: Prefix, type: str, writer: csv.writer, parallel_object: ParallelObject, time: float, env, values=None):
         self._id = id
         self._process = process
         self._start_time = params.START_SIMULATION
@@ -37,7 +37,7 @@ class Token(object):
         self._trans = self.next_transition() ## next activity to perform for the trace
         self._next_activity = self._trans.label
         self._resource_trace = self._process._get_resource_trace()
-
+        self.pr_wip_initial = params.PR_WIP_INITIAL
         self.END = False
 
     def _delete_places(self, places):
@@ -50,12 +50,11 @@ class Token(object):
 
     def inter_trigger_time(self, env, time):
         yield env.timeout(time)
-        print('TOKEN READY', self._id)
+        self._time_last_activity = env.now
         self._process.update_tokens_pending(self)
         self._process._update_state_traces(self._id, env)
-        self.END = True
 
-    def simulation(self, env: simpy.Environment, action): ### action = {task: ... , resource: ....}
+    def simulation(self, env, action): ### action = {task: ... , resource: ....}
         """
             The main function to handle the simulation of a single trace
         """
@@ -79,11 +78,12 @@ class Token(object):
         ### define resource for activity
         resource = self._process._get_resource(action['resource'])
         self._buffer.set_feature("ro_single", self._process.get_occupations_single_role(resource._get_name()))
-        self._buffer.set_feature("ro_total", self._process.get_occupations_all_role())
+        self._buffer.set_feature("ro_total", self._process.get_occupations_all_role(self._params.RESOURCE_TO_ROLE_LSTM[action['resource']]))
         self._buffer.set_feature("role", resource._get_name())
 
         self._buffer.set_feature("ro_single", self._process.get_occupations_single_role(resource._get_name()))
-        self._buffer.set_feature("ro_total", self._process.get_occupations_all_role())
+        self._buffer.set_feature("ro_single", self._process.get_occupations_single_role(resource._get_name()))
+        self._buffer.set_feature("ro_total", self._process.get_occupations_all_role(self._params.RESOURCE_TO_ROLE_LSTM[action['resource']]))
         self._buffer.set_feature("role", resource._get_name())
 
         ### register event in process ###
@@ -105,20 +105,29 @@ class Token(object):
         resource_task_request = resource_task.request()
         yield resource_task_request
         ### call predictor for processing time
-        self._buffer.set_feature("wip_start", 0)
+        self._buffer.set_feature("wip_start",  self._resource_trace.count)
         self._buffer.set_feature("ro_single", self._process.get_occupations_single_role(resource._get_name()))
-        self._buffer.set_feature("ro_total", self._process.get_occupations_all_role())
+        self._buffer.set_feature("ro_total", self._process.get_occupations_all_role(self._params.RESOURCE_TO_ROLE_LSTM[action['resource']]))
         self._buffer.set_feature("wip_activity", resource_task.count)
 
         #stop = resource.to_time_schedule(self._start_time + timedelta(seconds=env.now))
         #yield env.timeout(stop)
         self._buffer.set_feature("start_time", self._start_time + timedelta(seconds=env.now))
-        duration = self.define_processing_time(action['task'])
+        #duration = self.define_processing_time(action['task'])
+        #### Add prediction with LSTM model
+        transition = (self._params.INDEX_AC[action['task']], self._params.RESOURCE_TO_ROLE_LSTM[action['resource']])
+        ro_single = self._process.get_occupations_all_role(self._params.RESOURCE_TO_ROLE_LSTM[action['resource']])
+        pr_wip = self.pr_wip_initial + self._resource_trace.count
+        initial_ac_wip = self._params.AC_WIP_INITIAL[action['task']]
+        ac_wip = initial_ac_wip + resource_task.count
+        duration = self._process.get_predict_processing(str(self._id), pr_wip, transition,
+                                                        ac_wip, ro_single, self._start_time + timedelta(seconds=env.now))
         yield env.timeout(duration)
         self._buffer.set_feature("wip_end", self._resource_trace.count)
         self._buffer.set_feature("end_time", self._start_time + timedelta(seconds=env.now))
-        self._buffer.print_values()
+        self._buffer.set_feature("queue", duration)
         self._prefix.add_activity(action['task'])
+        self._buffer.print_values()
         resource.release(request_resource)
         self._process._release_single_resource(self._id, resource._get_name(), action['task'])
         resource_task.release(resource_task_request)
@@ -127,21 +136,21 @@ class Token(object):
         self._process.update_kpi_trace(self._id, actual_time)
 
         self._update_marking(self._trans)
-        if self._am:
-            self._trans = self.next_transition(env)
+        self._trans = self.next_transition(env)
+        if self._trans is not None:
             self._next_activity = self._trans.label
         else:
-            self._trans = None
             self._next_activity = None
+
+        self._time_last_activity = env.now
 
         if self._trans is None:  ### End of TRACE
             self._resource_trace.release(self._resource_trace_request)
             total_time = env.now - self._start_trace
-            self._process._release_resource_trace(self._id, total_time)
+            self._process._release_resource_trace(self._id, total_time, resource_task)
+            self.END = True
         else:
             self._process.update_tokens_pending(self)
-
-        self.END = True
 
     def _get_resource_role(self, activity):
         elements = self._params.ROLE_ACTIVITY[activity.label]
@@ -232,17 +241,6 @@ class Token(object):
             else:
                 next = random.choices(list(range(0, len(all_enabled_trans), 1)))[0]
         return all_enabled_trans[next]
-
-    '''def define_resource(self, trans, state):
-        #if trans.label in self._params.ROLE_ACTIVITY:
-        #    res = self._params.ROLE_ACTIVITY[trans.label]
-        #else:
-        #    raise ValueError('Not resource/role defined for this activity', trans.label)
-        res = self.call_custom_resource(trans, state)
-        if res not in self._params.ROLE_CAPACITY.keys():
-            raise ValueError('Not resource/role defined in json file', res)
-        #print(state)
-        return self._process._get_resource(res, trans.label)'''
 
     def define_processing_time(self, activity):
         """ Three different methods are available to define the processing time for each activity:
@@ -347,13 +345,11 @@ class Token(object):
         """
         return custom.custom_decision_mining(self._buffer)
 
-
     def next_transition(self, env= None):
         step = self.next_step()
         while step and step.label is None:
-            step = self.next_step()
             self._update_marking(step)
-            print('NEXT transition', step)
+            step = self.next_step()
         return step
 
     def next_step(self, env=None):

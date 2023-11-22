@@ -33,7 +33,7 @@ import random
 import pickle
 from datetime import datetime
 import os
-
+import pandas as pd
 
 def case_function_attribute(case: int, time: datetime):
     """
@@ -41,7 +41,7 @@ def case_function_attribute(case: int, time: datetime):
         Input parameters are case id number and trace start timestamp and return a dictionary.
         For example, we generate a trace attribute, the requested loan amount, to simulate the process from the BPIChallenge2012A.xes log.
     """
-    return {"AMOUNT": random.randint(100, 99999)}
+    return {}
 
 
 def event_function_attribute(case: int, time: datetime):
@@ -61,21 +61,10 @@ def custom_arrivals_time(case, previous):
     Function to define a new arrival of a trace. The input parameters are the case id number and the start timestamp of the previous trace.
     For example, we used an AutoRegression model for the *arrivals example*.
     """
-    loaded = AutoRegResults.load('example/example_arrivals/arrival_AutoReg_model.pkl')
-    return loaded.predict(case+1, case+1)[0]
-
-
-'''def custom_resource(buffer: Buffer, state, activity):
-        INPUT: Buffer (see in documentation https://francescameneghello.github.io/RIMS_tool/custom_function.html), state, activity_label
-
-        state --->
-        {'Role 1': {'not_available': 0, 'available': 2, 'resource_available': ['Sara', 'Mike'], 'resource_anavailable': []},
-         'Role 2': {'not_available': 1, 'available': 1, 'resource_available': ['Ellen'], 'resource_anavailable': ['Sue']},
-         'actual_assignment': [('A_CANCELLED', 'Role 2')],
-         'traces': {'ongoing': [(1, 17567.018973698334), (0, 22255.595833593703)], 'ended': []}}
-
-    return random.choice(['Role 1', 'Role 2'])'''
-
+    arrival = pd.read_csv('example/BPI_Challenge_2012_W_Two_TS/inter_arrival_rate.csv')
+    next = datetime.strptime(arrival.loc[case].at["timestamp"], '%Y-%m-%d %H:%M:%S')
+    interval = (next - previous).total_seconds()
+    return interval
 
 def custom_resource(state, tokens_pending, time):
     '''
@@ -92,12 +81,7 @@ def custom_resource(state, tokens_pending, time):
     OUPUT
         (token._id, token._next_activity, random.choice(state['resource_available'])) ====> tupla(id_case, next_activity,resource)
     '''
-    print('STATE', state)
-
-    token = tokens_pending[random.choice(list(tokens_pending.keys()))]
-    #token._buffer.print_values() ### to get the printed buffer on terminal
-    assign = (token._id, token._next_activity, random.choice(state['resource_available']))
-    return assign
+    pass
 
 
 

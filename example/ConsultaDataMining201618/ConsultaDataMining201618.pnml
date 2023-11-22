@@ -1,0 +1,333 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<pnml>
+  <net id="" type="http://www.pnml.org/version-2009/grammar/pnmlcoremodel">
+    <name>
+      <text></text>
+    </name>
+    <page id="n0">
+      <place id="ent_node_8174156c-fed9-4f9a-9bdc-357c40c45952">
+        <name>
+          <text>ent_node_8174156c-fed9-4f9a-9bdc-357c40c45952</text>
+        </name>
+      </place>
+      <place id="ent_node_a5676475-f414-4aaa-ae4b-fae52749b7e9">
+        <name>
+          <text>ent_node_a5676475-f414-4aaa-ae4b-fae52749b7e9</text>
+        </name>
+      </place>
+      <place id="ent_node_b7551541-1842-40cb-b530-59764cdfbed3">
+        <name>
+          <text>ent_node_b7551541-1842-40cb-b530-59764cdfbed3</text>
+        </name>
+      </place>
+      <place id="exi_node_c764d2dc-c0fd-4370-945d-c2d2f70c4dd1">
+        <name>
+          <text>exi_node_c764d2dc-c0fd-4370-945d-c2d2f70c4dd1</text>
+        </name>
+      </place>
+      <place id="ent_node_550bc12a-2971-4077-92aa-2fac48eb20c0">
+        <name>
+          <text>ent_node_550bc12a-2971-4077-92aa-2fac48eb20c0</text>
+        </name>
+      </place>
+      <place id="sink">
+        <name>
+          <text>sink</text>
+        </name>
+      </place>
+      <place id="exi_node_ebcf8548-98a7-4f6e-b6a5-320d47f2c521">
+        <name>
+          <text>exi_node_ebcf8548-98a7-4f6e-b6a5-320d47f2c521</text>
+        </name>
+      </place>
+      <place id="exi_node_10977a0f-5e37-454b-b21d-8a618ed8f650">
+        <name>
+          <text>exi_node_10977a0f-5e37-454b-b21d-8a618ed8f650</text>
+        </name>
+      </place>
+      <place id="ent_node_3ff1f849-94de-4f0a-a447-b358691b4cb3">
+        <name>
+          <text>ent_node_3ff1f849-94de-4f0a-a447-b358691b4cb3</text>
+        </name>
+      </place>
+      <place id="exi_node_9da6ba0a-cfad-4389-af56-78c3bf436915">
+        <name>
+          <text>exi_node_9da6ba0a-cfad-4389-af56-78c3bf436915</text>
+        </name>
+      </place>
+      <place id="exi_node_0116e288-b2d6-4877-982d-8c5f462c7ca0">
+        <name>
+          <text>exi_node_0116e288-b2d6-4877-982d-8c5f462c7ca0</text>
+        </name>
+      </place>
+      <place id="source">
+        <name>
+          <text>source</text>
+        </name>
+        <initialMarking>
+          <text>1</text>
+        </initialMarking>
+      </place>
+      <place id="exi_node_4c7e820e-0dd9-46ae-b2d0-7f81ee0be620">
+        <name>
+          <text>exi_node_4c7e820e-0dd9-46ae-b2d0-7f81ee0be620</text>
+        </name>
+      </place>
+      <place id="ent_node_1ad34ddb-3406-4201-ab4a-43ee31de2501">
+        <name>
+          <text>ent_node_1ad34ddb-3406-4201-ab4a-43ee31de2501</text>
+        </name>
+      </place>
+      <place id="ent_node_9eee0de2-c51d-4c51-a662-fb82502ac31b">
+        <name>
+          <text>ent_node_9eee0de2-c51d-4c51-a662-fb82502ac31b</text>
+        </name>
+      </place>
+      <place id="exi_node_7e9b001a-4fd2-43ee-97f9-2e6c3bfb8a90">
+        <name>
+          <text>exi_node_7e9b001a-4fd2-43ee-97f9-2e6c3bfb8a90</text>
+        </name>
+      </place>
+      <place id="ent_node_1007eb07-fad6-4a31-ac0b-75afa9844b77">
+        <name>
+          <text>ent_node_1007eb07-fad6-4a31-ac0b-75afa9844b77</text>
+        </name>
+      </place>
+      <place id="ent_node_ea263c81-da4e-4486-a91b-8e2e5db5d0c6">
+        <name>
+          <text>ent_node_ea263c81-da4e-4486-a91b-8e2e5db5d0c6</text>
+        </name>
+      </place>
+      <place id="ent_node_b8ecf232-b0bb-4b6f-9947-213915fd0221">
+        <name>
+          <text>ent_node_b8ecf232-b0bb-4b6f-9947-213915fd0221</text>
+        </name>
+      </place>
+      <place id="ent_node_ce824290-0d79-408d-bb96-c9f2415175a5">
+        <name>
+          <text>ent_node_ce824290-0d79-408d-bb96-c9f2415175a5</text>
+        </name>
+      </place>
+      <place id="ent_node_48f85f38-35be-4940-9ef6-14d8a564670a">
+        <name>
+          <text>ent_node_48f85f38-35be-4940-9ef6-14d8a564670a</text>
+        </name>
+      </place>
+      <transition id="node_208157df-caaf-4de3-b1d9-b6a331447df6">
+        <name>
+          <text>Transferir Creditos</text>
+        </name>
+      </transition>
+      <transition id="node_1ad34ddb-3406-4201-ab4a-43ee31de2501">
+        <name>
+          <text>node_1ad34ddb-3406-4201-ab4a-43ee31de2501</text>
+        </name>
+        <toolspecific tool="ProM" version="6.4" activity="$invisible$" localNodeID="8b4abd90-454a-4bd2-8dee-f288a408de3d"/>
+      </transition>
+      <transition id="63c668e7-1a68-44bf-b4cf-1238fc4885b6">
+        <name>
+          <text>63c668e7-1a68-44bf-b4cf-1238fc4885b6</text>
+        </name>
+        <toolspecific tool="ProM" version="6.4" activity="$invisible$" localNodeID="a32d1e1a-bb84-405e-942b-3dfd9335553d"/>
+      </transition>
+      <transition id="node_0685aae2-45a8-47a3-addb-f69bee0c223a">
+        <name>
+          <text>Validar solicitud</text>
+        </name>
+      </transition>
+      <transition id="node_1007eb07-fad6-4a31-ac0b-75afa9844b77">
+        <name>
+          <text>Radicar Solicitud Homologacion</text>
+        </name>
+      </transition>
+      <transition id="node_99151495-e291-4252-9253-09365b8766a9">
+        <name>
+          <text>Revisar curso</text>
+        </name>
+      </transition>
+      <transition id="node_ea263c81-da4e-4486-a91b-8e2e5db5d0c6">
+        <name>
+          <text>Notificacion estudiante cancelacion soli</text>
+        </name>
+      </transition>
+      <transition id="node_b8ecf232-b0bb-4b6f-9947-213915fd0221">
+        <name>
+          <text>node_b8ecf232-b0bb-4b6f-9947-213915fd0221</text>
+        </name>
+        <toolspecific tool="ProM" version="6.4" activity="$invisible$" localNodeID="e94b5c45-ce74-4640-a78c-59fdf05d547c"/>
+      </transition>
+      <transition id="node_201bb832-3bc3-4f48-bdbb-89d780fd030a">
+        <name>
+          <text>Validar solicitud / pre-homologacion</text>
+        </name>
+      </transition>
+      <transition id="bffdcce5-bf33-4d12-8cb8-1c0d01e26216">
+        <name>
+          <text>bffdcce5-bf33-4d12-8cb8-1c0d01e26216</text>
+        </name>
+        <toolspecific tool="ProM" version="6.4" activity="$invisible$" localNodeID="282747e4-6ba8-4558-9bb8-39c7cefa2497"/>
+      </transition>
+      <transition id="node_b549a6d7-0232-4cdd-9bbf-1556ae10e52b">
+        <name>
+          <text>Evaluacion curso</text>
+        </name>
+      </transition>
+      <transition id="1e766e4f-d9b1-4c3b-81c0-2dca839140eb">
+        <name>
+          <text>1e766e4f-d9b1-4c3b-81c0-2dca839140eb</text>
+        </name>
+        <toolspecific tool="ProM" version="6.4" activity="$invisible$" localNodeID="80df405a-90d1-43bd-8abd-8b8694860def"/>
+      </transition>
+      <transition id="69fddf5e-fc86-4be3-a268-80c9a60a8bc4">
+        <name>
+          <text>69fddf5e-fc86-4be3-a268-80c9a60a8bc4</text>
+        </name>
+        <toolspecific tool="ProM" version="6.4" activity="$invisible$" localNodeID="08ca9a13-0575-4f8c-b39c-cb6a58cbb42b"/>
+      </transition>
+      <transition id="node_8174156c-fed9-4f9a-9bdc-357c40c45952">
+        <name>
+          <text>node_8174156c-fed9-4f9a-9bdc-357c40c45952</text>
+        </name>
+        <toolspecific tool="ProM" version="6.4" activity="$invisible$" localNodeID="55408d68-75d1-40c9-a173-f8782027ab88"/>
+      </transition>
+      <transition id="node_92ee88f0-88ab-4de5-add5-0a610d6df22f">
+        <name>
+          <text>Homologacion por grupo de cursos</text>
+        </name>
+      </transition>
+      <transition id="node_b2cb70b3-e9ca-4a40-89d3-e44e6d39e208">
+        <name>
+          <text>Recepcion de documentos</text>
+        </name>
+      </transition>
+      <transition id="node_882bb0fe-1708-4e90-926e-730b66b08b8b">
+        <name>
+          <text>Avanzar recepcion documentos</text>
+        </name>
+      </transition>
+      <transition id="node_6f172221-8b8f-478d-ad9b-d8f53dd3482e">
+        <name>
+          <text>Cancelar Solicitud</text>
+        </name>
+      </transition>
+      <transition id="node_a5676475-f414-4aaa-ae4b-fae52749b7e9">
+        <name>
+          <text>Transferir creditos homologables</text>
+        </name>
+      </transition>
+      <transition id="45a490e5-8d99-4fb1-983d-b29e60b65c62">
+        <name>
+          <text>45a490e5-8d99-4fb1-983d-b29e60b65c62</text>
+        </name>
+        <toolspecific tool="ProM" version="6.4" activity="$invisible$" localNodeID="5fc9d912-3764-4ed1-9593-9b39f5a0675f"/>
+      </transition>
+      <transition id="node_5217e77d-f352-49ba-a6c1-a3acd4fcdaee">
+        <name>
+          <text>Validacion final</text>
+        </name>
+      </transition>
+      <transition id="node_b7551541-1842-40cb-b530-59764cdfbed3">
+        <name>
+          <text>node_b7551541-1842-40cb-b530-59764cdfbed3</text>
+        </name>
+        <toolspecific tool="ProM" version="6.4" activity="$invisible$" localNodeID="b2373bda-92ff-47f4-b5fc-078771cfafcc"/>
+      </transition>
+      <transition id="29030cd5-0dc7-43f6-b204-70789d6c08b2">
+        <name>
+          <text>29030cd5-0dc7-43f6-b204-70789d6c08b2</text>
+        </name>
+        <toolspecific tool="ProM" version="6.4" activity="$invisible$" localNodeID="8e0ae1fc-31bd-49c1-876b-29fb6acd092e"/>
+      </transition>
+      <transition id="node_550bc12a-2971-4077-92aa-2fac48eb20c0">
+        <name>
+          <text>Visto Bueno Cierre Proceso</text>
+        </name>
+      </transition>
+      <transition id="node_ce824290-0d79-408d-bb96-c9f2415175a5">
+        <name>
+          <text>node_ce824290-0d79-408d-bb96-c9f2415175a5</text>
+        </name>
+        <toolspecific tool="ProM" version="6.4" activity="$invisible$" localNodeID="3d015b7a-ae00-4f86-804e-e9274bb50b3f"/>
+      </transition>
+      <transition id="node_3ff1f849-94de-4f0a-a447-b358691b4cb3">
+        <name>
+          <text>node_3ff1f849-94de-4f0a-a447-b358691b4cb3</text>
+        </name>
+        <toolspecific tool="ProM" version="6.4" activity="$invisible$" localNodeID="b8b2cbb1-1fde-4edd-a9e9-163da70a835c"/>
+      </transition>
+      <transition id="node_e87b36fc-b15d-418f-83c4-e641343e1992">
+        <name>
+          <text>Cancelar curso</text>
+        </name>
+      </transition>
+      <transition id="node_3b1a953d-73e0-43cd-b0d9-33c3cb8e356d">
+        <name>
+          <text>Traer informacion estudiante - banner</text>
+        </name>
+      </transition>
+      <arc id="140526663433232" source="node_201bb832-3bc3-4f48-bdbb-89d780fd030a" target="exi_node_0116e288-b2d6-4877-982d-8c5f462c7ca0"/>
+      <arc id="140526663443984" source="exi_node_10977a0f-5e37-454b-b21d-8a618ed8f650" target="node_0685aae2-45a8-47a3-addb-f69bee0c223a"/>
+      <arc id="140526663443504" source="exi_node_c764d2dc-c0fd-4370-945d-c2d2f70c4dd1" target="node_99151495-e291-4252-9253-09365b8766a9"/>
+      <arc id="140525558662192" source="ent_node_3ff1f849-94de-4f0a-a447-b358691b4cb3" target="node_3ff1f849-94de-4f0a-a447-b358691b4cb3"/>
+      <arc id="140526663431216" source="node_8174156c-fed9-4f9a-9bdc-357c40c45952" target="ent_node_1ad34ddb-3406-4201-ab4a-43ee31de2501"/>
+      <arc id="140526663432752" source="node_3ff1f849-94de-4f0a-a447-b358691b4cb3" target="ent_node_b7551541-1842-40cb-b530-59764cdfbed3"/>
+      <arc id="140526663443024" source="node_1007eb07-fad6-4a31-ac0b-75afa9844b77" target="exi_node_10977a0f-5e37-454b-b21d-8a618ed8f650"/>
+      <arc id="140526663433808" source="node_ea263c81-da4e-4486-a91b-8e2e5db5d0c6" target="ent_node_b7551541-1842-40cb-b530-59764cdfbed3"/>
+      <arc id="140526663444560" source="exi_node_0116e288-b2d6-4877-982d-8c5f462c7ca0" target="node_882bb0fe-1708-4e90-926e-730b66b08b8b"/>
+      <arc id="140526663433328" source="node_5217e77d-f352-49ba-a6c1-a3acd4fcdaee" target="ent_node_550bc12a-2971-4077-92aa-2fac48eb20c0"/>
+      <arc id="140525558750320" source="ent_node_1ad34ddb-3406-4201-ab4a-43ee31de2501" target="node_1ad34ddb-3406-4201-ab4a-43ee31de2501"/>
+      <arc id="140525558781552" source="exi_node_ebcf8548-98a7-4f6e-b6a5-320d47f2c521" target="bffdcce5-bf33-4d12-8cb8-1c0d01e26216"/>
+      <arc id="140526663442544" source="node_92ee88f0-88ab-4de5-add5-0a610d6df22f" target="exi_node_c764d2dc-c0fd-4370-945d-c2d2f70c4dd1"/>
+      <arc id="140526663431792" source="29030cd5-0dc7-43f6-b204-70789d6c08b2" target="ent_node_48f85f38-35be-4940-9ef6-14d8a564670a"/>
+      <arc id="140526663444080" source="exi_node_10977a0f-5e37-454b-b21d-8a618ed8f650" target="node_6f172221-8b8f-478d-ad9b-d8f53dd3482e"/>
+      <arc id="140525558749840" source="ent_node_1007eb07-fad6-4a31-ac0b-75afa9844b77" target="node_1007eb07-fad6-4a31-ac0b-75afa9844b77"/>
+      <arc id="140525558782608" source="exi_node_9da6ba0a-cfad-4389-af56-78c3bf436915" target="69fddf5e-fc86-4be3-a268-80c9a60a8bc4"/>
+      <arc id="140526663432848" source="node_1ad34ddb-3406-4201-ab4a-43ee31de2501" target="ent_node_3ff1f849-94de-4f0a-a447-b358691b4cb3"/>
+      <arc id="140526663443600" source="ent_node_9eee0de2-c51d-4c51-a662-fb82502ac31b" target="node_5217e77d-f352-49ba-a6c1-a3acd4fcdaee"/>
+      <arc id="140525558674096" source="ent_node_ea263c81-da4e-4486-a91b-8e2e5db5d0c6" target="node_ea263c81-da4e-4486-a91b-8e2e5db5d0c6"/>
+      <arc id="140526663381680" source="exi_node_7e9b001a-4fd2-43ee-97f9-2e6c3bfb8a90" target="1e766e4f-d9b1-4c3b-81c0-2dca839140eb"/>
+      <arc id="140526663432368" source="node_e87b36fc-b15d-418f-83c4-e641343e1992" target="ent_node_1ad34ddb-3406-4201-ab4a-43ee31de2501"/>
+      <arc id="140525558697168" source="ent_node_b8ecf232-b0bb-4b6f-9947-213915fd0221" target="node_b8ecf232-b0bb-4b6f-9947-213915fd0221"/>
+      <arc id="140526663442640" source="node_b549a6d7-0232-4cdd-9bbf-1556ae10e52b" target="exi_node_7e9b001a-4fd2-43ee-97f9-2e6c3bfb8a90"/>
+      <arc id="140526663430352" source="node_b2cb70b3-e9ca-4a40-89d3-e44e6d39e208" target="ent_node_b8ecf232-b0bb-4b6f-9947-213915fd0221"/>
+      <arc id="140526663431888" source="node_a5676475-f414-4aaa-ae4b-fae52749b7e9" target="ent_node_ce824290-0d79-408d-bb96-c9f2415175a5"/>
+      <arc id="140526663444176" source="exi_node_4c7e820e-0dd9-46ae-b2d0-7f81ee0be620" target="node_b549a6d7-0232-4cdd-9bbf-1556ae10e52b"/>
+      <arc id="140526663382256" source="exi_node_0116e288-b2d6-4877-982d-8c5f462c7ca0" target="45a490e5-8d99-4fb1-983d-b29e60b65c62"/>
+      <arc id="140526663432944" source="bffdcce5-bf33-4d12-8cb8-1c0d01e26216" target="ent_node_b8ecf232-b0bb-4b6f-9947-213915fd0221"/>
+      <arc id="140526663443696" source="ent_node_48f85f38-35be-4940-9ef6-14d8a564670a" target="node_92ee88f0-88ab-4de5-add5-0a610d6df22f"/>
+      <arc id="140526663443216" source="69fddf5e-fc86-4be3-a268-80c9a60a8bc4" target="ent_node_ce824290-0d79-408d-bb96-c9f2415175a5"/>
+      <arc id="140526663430928" source="node_882bb0fe-1708-4e90-926e-730b66b08b8b" target="ent_node_9eee0de2-c51d-4c51-a662-fb82502ac31b"/>
+      <arc id="140526663442736" source="node_6f172221-8b8f-478d-ad9b-d8f53dd3482e" target="ent_node_ea263c81-da4e-4486-a91b-8e2e5db5d0c6"/>
+      <arc id="140526663444272" source="exi_node_ebcf8548-98a7-4f6e-b6a5-320d47f2c521" target="node_b2cb70b3-e9ca-4a40-89d3-e44e6d39e208"/>
+      <arc id="140526096469824" source="ent_node_ce824290-0d79-408d-bb96-c9f2415175a5" target="node_ce824290-0d79-408d-bb96-c9f2415175a5"/>
+      <arc id="140525558695248" source="ent_node_8174156c-fed9-4f9a-9bdc-357c40c45952" target="node_8174156c-fed9-4f9a-9bdc-357c40c45952"/>
+      <arc id="140526663443792" source="source" target="node_3b1a953d-73e0-43cd-b0d9-33c3cb8e356d"/>
+      <arc id="140526663409520" source="1e766e4f-d9b1-4c3b-81c0-2dca839140eb" target="ent_node_9eee0de2-c51d-4c51-a662-fb82502ac31b"/>
+      <arc id="140526663443312" source="node_b7551541-1842-40cb-b530-59764cdfbed3" target="sink"/>
+      <arc id="140526663407984" source="45a490e5-8d99-4fb1-983d-b29e60b65c62" target="ent_node_8174156c-fed9-4f9a-9bdc-357c40c45952"/>
+      <arc id="140526663442832" source="node_99151495-e291-4252-9253-09365b8766a9" target="exi_node_4c7e820e-0dd9-46ae-b2d0-7f81ee0be620"/>
+      <arc id="140526663432080" source="node_0685aae2-45a8-47a3-addb-f69bee0c223a" target="exi_node_ebcf8548-98a7-4f6e-b6a5-320d47f2c521"/>
+      <arc id="140526663433616" source="node_ce824290-0d79-408d-bb96-c9f2415175a5" target="ent_node_8174156c-fed9-4f9a-9bdc-357c40c45952"/>
+      <arc id="140526663444368" source="exi_node_7e9b001a-4fd2-43ee-97f9-2e6c3bfb8a90" target="node_201bb832-3bc3-4f48-bdbb-89d780fd030a"/>
+      <arc id="140526663431600" source="node_208157df-caaf-4de3-b1d9-b6a331447df6" target="ent_node_a5676475-f414-4aaa-ae4b-fae52749b7e9"/>
+      <arc id="140526663433136" source="node_3b1a953d-73e0-43cd-b0d9-33c3cb8e356d" target="ent_node_1007eb07-fad6-4a31-ac0b-75afa9844b77"/>
+      <arc id="140525558748592" source="ent_node_a5676475-f414-4aaa-ae4b-fae52749b7e9" target="node_a5676475-f414-4aaa-ae4b-fae52749b7e9"/>
+      <arc id="140525558819760" source="exi_node_c764d2dc-c0fd-4370-945d-c2d2f70c4dd1" target="63c668e7-1a68-44bf-b4cf-1238fc4885b6"/>
+      <arc id="140526663443888" source="exi_node_4c7e820e-0dd9-46ae-b2d0-7f81ee0be620" target="node_e87b36fc-b15d-418f-83c4-e641343e1992"/>
+      <arc id="140526663443408" source="node_b8ecf232-b0bb-4b6f-9947-213915fd0221" target="ent_node_48f85f38-35be-4940-9ef6-14d8a564670a"/>
+      <arc id="140526663432656" source="node_550bc12a-2971-4077-92aa-2fac48eb20c0" target="exi_node_9da6ba0a-cfad-4389-af56-78c3bf436915"/>
+      <arc id="140525558677456" source="ent_node_b7551541-1842-40cb-b530-59764cdfbed3" target="node_b7551541-1842-40cb-b530-59764cdfbed3"/>
+      <arc id="140526663430640" source="63c668e7-1a68-44bf-b4cf-1238fc4885b6" target="ent_node_3ff1f849-94de-4f0a-a447-b358691b4cb3"/>
+      <arc id="140526663384560" source="exi_node_4c7e820e-0dd9-46ae-b2d0-7f81ee0be620" target="29030cd5-0dc7-43f6-b204-70789d6c08b2"/>
+      <arc id="140525558663152" source="ent_node_550bc12a-2971-4077-92aa-2fac48eb20c0" target="node_550bc12a-2971-4077-92aa-2fac48eb20c0"/>
+      <arc id="140526663444464" source="exi_node_9da6ba0a-cfad-4389-af56-78c3bf436915" target="node_208157df-caaf-4de3-b1d9-b6a331447df6"/>
+    </page>
+    <finalmarkings>
+      <marking>
+        <place idref="sink">
+          <text>1</text>
+        </place>
+      </marking>
+    </finalmarkings>
+  </net>
+</pnml>

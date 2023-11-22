@@ -1,0 +1,74 @@
+{
+    "start_timestamp": "2012-02-13 20:42:08",
+    "interTriggerTimer": {
+        "type": "custom"
+    },
+    "resource": {
+        "10933.0": {"resources": ["10933.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}},
+        "11179.0": {"resources": ["11179.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}},
+        "11299.0": {"resources": ["11299.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "10889.0": {"resources": ["10889.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "10789.0": {"resources": ["10789.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "10809.0": {"resources": ["10809.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "11269.0": {"resources": ["11269.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "11169.0": {"resources": ["11169.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "11259.0": {"resources": ["11259.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "10914.0": {"resources": ["10914.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "10609.0": {"resources": ["10609.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "11119.0": {"resources": ["11119.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "11002.0": {"resources": ["11002.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "10188.0": {"resources": ["10188.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "11009.0": {"resources": ["11009.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "10779.0": {"resources": ["10779.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "11300.0": {"resources": ["11300.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "11121.0": {"resources": ["11121.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "11304.0": {"resources": ["11304.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "10935.0": {"resources": ["10935.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "11019.0": {"resources": ["11019.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "11289.0": {"resources": ["11289.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "NOT_SET": {"resources": ["NOT_SET"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "11180.0": {"resources": ["11180.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "10929.0": {"resources": ["10929.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "10931.0": {"resources": ["10931.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "10881.0": {"resources": ["10881.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "10909.0": {"resources": ["10909.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "11000.0": {"resources": ["11000.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "11049.0": {"resources": ["11049.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "10138.0": {"resources": ["10138.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "10861.0": {"resources": ["10861.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "11003.0": {"resources": ["11003.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "10939.0": {"resources": ["10939.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "10913.0": {"resources": ["10913.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "10912.0": {"resources": ["10912.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "11302.0": {"resources": ["11302.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "10124.0": {"resources": ["10124.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "11181.0": {"resources": ["11181.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "11309.0": {"resources": ["11309.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "11339.0": {"resources": ["11339.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "10910.0": {"resources": ["10910.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "10932.0": {"resources": ["10932.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "11001.0": {"resources": ["11001.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "11203.0": {"resources": ["11203.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "11189.0": {"resources": ["11189.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "10982.0": {"resources": ["10982.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "11079.0": {"resources": ["11079.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "10899.0": {"resources": ["10899.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "10821.0": {"resources": ["10821.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "10972.0": {"resources": ["10972.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "11201.0": {"resources": ["11201.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "10228.0": {"resources": ["10228.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "11319.0": {"resources": ["11319.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "10863.0": {"resources": ["10863.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "11122.0": {"resources": ["11122.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "10125.0": {"resources": ["10125.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "10629.0": {"resources": ["10629.0"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}},
+    "processing_time": {
+        "W_Beoordelen fraude":  {
+            "name": "custom"
+        },
+        "W_Afhandelen leads":  {
+            "name": "custom"
+        },
+        "W_Nabellen incomplete dossiers":  {
+            "name": "custom"
+        },
+        "W_Valideren aanvraag":  {
+            "name": "custom"
+        },
+        "W_Nabellen offertes":  {
+            "name": "custom"
+        },
+        "W_Completeren aanvraag":  {
+            "name": "custom"
+        }
+    },
+    "probability": {
+    },
+    "resource_table": [
+        {
+            "role": "Role 1",
+            "task": "A_SUBMITTED"
+        },
+        {
+            "role": "Role 2",
+            "task": "A_PARTLYSUBMITTED"
+        },
+        {
+            "role": "Role 2",
+            "task": "A_PREACCEPTED"
+        },
+        {
+            "role": "Role 1",
+            "task": "A_ACCEPTED"
+        },
+        {
+            "role": "Role 2",
+            "task": "A_FINALIZED"
+        },
+        {
+            "role": "Role 2",
+            "task": "A_CANCELLED"
+        },
+        {
+            "role": "Role 2",
+            "task": "A_DECLINED"
+        },
+        {
+            "role": "Role 2",
+            "task": "A_APPROVED"
+        },
+        {
+            "role": "Role 2",
+            "task": "A_REGISTERED"
+        },
+        {
+            "role": "Role 2",
+            "task": "A_ACTIVATED"
+        }
+    ]
+}

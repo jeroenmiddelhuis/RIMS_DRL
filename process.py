@@ -7,8 +7,8 @@ import simpy
 from role_simulator import RoleSimulator
 import math
 from parameters import Parameters
-import custom_function as custom
-from simpy.events import AnyOf
+from call_LSTM import Predictor
+
 
 class SimulationProcess(object):
 
@@ -22,28 +22,16 @@ class SimulationProcess(object):
         self._am_parallel = []
         self._actual_assignment = []
         self.traces = {"ongoing": [], "ended": []}
-
         self.resources_available = True ### check if there are resource to assign one event
         self.tokens_pending = {} ### dictionary keyv = id_case, element = tokenOBJ
         self.next_assign = None
-        #self.tokens_event = {'None': self._env.event()}
 
+        self.predictor = Predictor((self._params.MODEL_PATH_PROCESSING, self._params.MODEL_PATH_WAITING), self._params)
+        self.predictor.predict()
 
-
-    #def start_token(self, token_id, activity, resource):
-    #    ### in base a cosa mi dice STEP LIBERO LA RISORSA DEL TOKEN
-    #    self.token_handle[token_id]['res'] = resource
-    #    self.token_handle[token_id]['obj'].release(self.token_handle[token_id]['request'])
-    #    print('RELEASE', token_id)
-
-    #def get_resource_RL(self, id):
-    #    return self._get_resource(self.token_handle[id]['res'])
-
-    #def get_token(self, id):
-    #    return self.token_handle[id]['obj']
 
     def update_tokens_pending(self, token):
-        self.tokens_pending[token._id] = token
+        self.tokens_pending[token._id] = [token, token._time_last_activity]
 
     def del_tokens_pending(self, id):
         del self.tokens_pending[id]
@@ -55,9 +43,10 @@ class SimulationProcess(object):
         set_resource = list(self._params.ROLE_CAPACITY.keys())
         dict_role = dict()
         for res in set_resource:
-            res_simpy = RoleSimulator(self._env, res, self._params.ROLE_CAPACITY[res][0],
-                                      self._params.ROLE_CAPACITY[res][1])
-            dict_role[res] = res_simpy
+            if res in self._params.RESOURCE_TO_ROLE_LSTM.keys():
+                res_simpy = RoleSimulator(self._env, res, self._params.ROLE_CAPACITY[res][0],
+                                          self._params.ROLE_CAPACITY[res][1])
+                dict_role[res] = res_simpy
         return dict_role
 
     def get_occupations_single_role(self, resource):
@@ -68,16 +57,30 @@ class SimulationProcess(object):
         occup = self._resources[resource]._get_resource().count / self._resources[resource]._capacity
         return round(occup, 2)
 
-    def get_occupations_all_role(self):
+    def get_occupations_all_role(self, role):
         """
         Method to retrieve the occupancy in percentage of all roles, as an intercase feature.
         """
-        list_occupations = []
+        occup = []
+        if self._params.FEATURE_ROLE == 'all_role':
+            for key in self._params.ROLE_CAPACITY_LSTM:
+                if key != 'SYSTEM':
+                    occup.append(self.get_occupations_single_role_LSTM(key))
+        else:
+            occup.append(self.get_occupations_single_role_LSTM(role))
+        return occup
+
+    def get_occupations_single_role_LSTM(self, role):
+        """
+        Method to retrieve the specified role occupancy in percentage, as an intercase feature:
+        $\\frac{resources \: occupated \: in \:role}{total\:resources\:in\:role}$.
+        """
+        occup = 0
         for res in self._resources:
-            if res != 'TRIGGER_TIMER':
-                occup = round(self._resources[res]._get_resource().count / self._resources[res]._capacity, 2)
-                list_occupations.append(occup)
-        return list_occupations
+            if self._params.RESOURCE_TO_ROLE_LSTM[res] == role:
+                occup += self._resources[res]._get_resource().count
+        occup = occup / self._params.ROLE_CAPACITY_LSTM[role][0]
+        return round(occup, 2)
 
 
     def get_state(self):
@@ -94,24 +97,6 @@ class SimulationProcess(object):
         state['traces'] = self.traces
         return state
 
-    '''def get_state(self):
-        state = dict()
-        for res in self._resources:
-            if res != 'TRIGGER_TIMER':
-                occup = self._resources[res]._get_resource().count
-                no_occup = self._resources[res]._capacity - self._resources[res]._get_resource().count
-                state[res] = {'not_available': occup, 'available': no_occup, 'resource_available': self._resources[res].get_available_single_resource(),
-                              'resource_anavailable': self._resources[res].get_anavailable_single_resource()}
-        state['actual_assignment'] = self._actual_assignment
-        state['traces'] = self.traces
-        return state
-
-    def _get_resource(self, resource_label, activity):
-        if resource_label != 'TRIGGER_TIMER':
-            self._actual_assignment.append((activity, resource_label))
-        self.check_resource_available()
-        return self._resources[resource_label]'''
-
     def _get_resource(self, res):
         return self._resources[res]
     def set_actual_assignment(self, id, activity, res):
@@ -126,13 +111,14 @@ class SimulationProcess(object):
     def _update_state_traces(self, id, env):
         self.traces["ongoing"].append((id, env.now))
 
-    def _release_resource_trace(self, id, time):
+    def _release_resource_trace(self, id, time, request_resource):
         tupla = ()
         for i in self.traces["ongoing"]:
             if i[0] == id:
                 tupla = i
         self.traces["ongoing"].remove(tupla)
         self.traces["ended"].append((id, time))
+        self._resource_trace.release(request_resource)
 
     def update_kpi_trace(self, id, time):
         tupla = ()
@@ -152,5 +138,9 @@ class SimulationProcess(object):
         return self._resources[resource_task]._get_resources_name()
 
     def _release_single_resource(self, id, res, activity):
-        if res != 'TRIGGER_TIMER':
+       if res != 'TRIGGER_TIMER':
             self._actual_assignment.remove((id, activity, res))
+
+    def get_predict_processing(self, cid, pr_wip, transition, ac_wip, rp_oc, time):
+        return self.predictor.processing_time(cid, pr_wip, transition, ac_wip, rp_oc, time)
+
