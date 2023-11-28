@@ -6,7 +6,9 @@ from gym_env import gym_env
 from sb3_contrib import MaskablePPO
 import random
 
-#model = MaskablePPO.load("/Users/francescameneghello/Documents/GitHub/rl-rims/tmp/20000000_25600_2023-11-21 13:00:43.547943/rl_model_1300000_steps.zip/")
+
+### FIX right path
+#model = MaskablePPO.load("/tmp/20000000_25600_2023-11-21 13:00:43.547943/rl_model_1300000_steps.zip/")
 
 NAME_LOG = 'slow_server'
 POlICY = 'SPT'
@@ -14,8 +16,8 @@ POlICY = 'SPT'
 median_processing_time = {"Activity E": {"R5": 0.97040, "R6": 1.24766}, "Activity F": {"R5": 1.10903, "R6": 2.07944}}
 
 def FIFO(state, tokens):
-    if len(tokens)>0 and len(state['resource_available'])>0:
-        token_id= max(tokens.items(), key=lambda x: x[1][1])[0]
+    if len(tokens) > 0 and len(state['resource_available'])>0:
+        token_id = max(tokens.items(), key=lambda x: x[1][1])[0]
         activity = tokens[token_id][0]._next_activity
         res = random.choice(state['resource_available'])
         return (token_id, activity, res)
