@@ -26,8 +26,8 @@ class SimulationProcess(object):
         self.tokens_pending = {} ### dictionary keyv = id_case, element = tokenOBJ
         self.next_assign = None
 
-        self.predictor = Predictor((self._params.MODEL_PATH_PROCESSING, self._params.MODEL_PATH_WAITING), self._params)
-        self.predictor.predict()
+        #self.predictor = Predictor((self._params.MODEL_PATH_PROCESSING, self._params.MODEL_PATH_WAITING), self._params)
+        #self.predictor.predict()
 
 
     def update_tokens_pending(self, token):
@@ -43,10 +43,10 @@ class SimulationProcess(object):
         set_resource = list(self._params.ROLE_CAPACITY.keys())
         dict_role = dict()
         for res in set_resource:
-            if res in self._params.RESOURCE_TO_ROLE_LSTM.keys():
-                res_simpy = RoleSimulator(self._env, res, self._params.ROLE_CAPACITY[res][0],
-                                          self._params.ROLE_CAPACITY[res][1])
-                dict_role[res] = res_simpy
+            #if res in self._params.RESOURCE_TO_ROLE_LSTM.keys():
+            res_simpy = RoleSimulator(self._env, res, self._params.ROLE_CAPACITY[res][0],
+                                      self._params.ROLE_CAPACITY[res][1])
+            dict_role[res] = res_simpy
         return dict_role
 
     def get_occupations_single_role(self, resource):

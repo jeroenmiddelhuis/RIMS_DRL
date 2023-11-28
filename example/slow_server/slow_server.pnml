@@ -1,0 +1,49 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<pnml>
+  <net id="" type="http://www.pnml.org/version-2009/grammar/pnmlcoremodel">
+    <name>
+      <text></text>
+    </name>
+    <page id="n0">
+      <place id="source">
+        <name>
+          <text>source</text>
+        </name>
+        <initialMarking>
+          <text>1</text>
+        </initialMarking>
+      </place>
+      <place id="sink">
+        <name>
+          <text>sink</text>
+        </name>
+      </place>
+      <place id="ent_Activity_15ee7ez">
+        <name>
+          <text>ent_Activity_15ee7ez</text>
+        </name>
+      </place>
+      <transition id="Activity_0ny5884">
+        <name>
+          <text>Activity E</text>
+        </name>
+      </transition>
+      <transition id="Activity_15ee7ez">
+        <name>
+          <text>Activity F</text>
+        </name>
+      </transition>
+      <arc id="140395396220816" source="source" target="Activity_0ny5884"/>
+      <arc id="140395396220336" source="Activity_0ny5884" target="ent_Activity_15ee7ez"/>
+      <arc id="140395396220720" source="Activity_15ee7ez" target="sink"/>
+      <arc id="140395687852112" source="ent_Activity_15ee7ez" target="Activity_15ee7ez"/>
+    </page>
+    <finalmarkings>
+      <marking>
+        <place idref="sink">
+          <text>1</text>
+        </place>
+      </marking>
+    </finalmarkings>
+  </net>
+</pnml>

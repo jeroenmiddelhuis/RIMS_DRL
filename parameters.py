@@ -21,7 +21,7 @@ class Parameters(object):
             self.prefix = ('_dispr', '_dpispr', '_dwispr')
         self.NAME_EXP = name_log
         self.read_metadata_file()
-        self.parameters_LSTM_model()
+        #self.parameters_LSTM_model()
 
     def read_metadata_file(self):
         '''

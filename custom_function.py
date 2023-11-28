@@ -34,6 +34,8 @@ import pickle
 from datetime import datetime
 import os
 import pandas as pd
+import numpy as np
+
 
 def case_function_attribute(case: int, time: datetime):
     """
@@ -113,15 +115,11 @@ def custom_processing_time(buffer: Buffer):
             }
     ```
     """
-    input_feature = list()
-    input_feature.append(buffer.get_feature("wip_start"))
-    input_feature.append(buffer.get_feature("wip_activity"))
-    input_feature.append(buffer.get_feature("start_time").weekday())
-    input_feature.append(buffer.get_feature("start_time").hour)
-    loaded_model = pickle.load(
-        open(os.getcwd()+'/example/example_process_times/processing_time_random_forest.pkl', 'rb'))
-    y_pred_f = loaded_model.predict([input_feature])
-    return int(y_pred_f[0])
+    processing_time = {"Activity E": {"R5": 1.4, "R6": 1.8}, "Activity F": {"R5": 1.6, "R6": 3.0}}
+    task = buffer.get_feature("activity")
+    resource = buffer.get_feature("resource")
+    duration = np.random.exponential(processing_time[task][resource], 1)[0]*60
+    return duration
 
 
 def custom_waiting_time(buffer: Buffer):

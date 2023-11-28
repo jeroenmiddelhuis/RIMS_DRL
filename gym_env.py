@@ -48,13 +48,15 @@ class gym_env(Env):
                      #+ ['wip', 'day', 'hour']
 
         # The outputs are: the assignments (resource, task_type)
-        #self.output = [(resource, task_type) for task_type in self.task_types for resource in self.resources] + ['Postpone']
+        self.output = [(resource, task_type) for task_type in self.task_types for resource in self.resources] + ['Postpone']
 
         path_model = './example/' + self.name_log + '/' + self.name_log
         if exists(path_model + '_diapr_meta.json'):
             self.FEATURE_ROLE = 'all_role'
         elif exists(path_model + '_dispr_meta.json'):
             self.FEATURE_ROLE = 'no_all_role'
+        else:
+            self.FEATURE_ROLE = None
         self.PATH_PETRINET = './example/' + self.name_log + '/' + self.name_log + '.pnml'
         PATH_PARAMETERS = input_file
         self.N_TRACES = 100
@@ -63,7 +65,7 @@ class gym_env(Env):
         self.params = Parameters(PATH_PARAMETERS, self.N_TRACES, self.name_log, self.FEATURE_ROLE)
 
         ### define possible assignments from log
-        self.output = self.retrieve_possible_assignments(self.params.RESOURCE_TO_ROLE_LSTM)
+        ###self.output = self.retrieve_possible_assignments(self.params.RESOURCE_TO_ROLE_LSTM)
 
         # Observation space
         lows = np.array([0 for _ in range(len(self.input))])
@@ -193,6 +195,30 @@ class gym_env(Env):
         self.state = self.get_state()
         #if DEBUG_PRINT: print('state after', self.state, '\n')
         return self.state, reward, isTerminated, {}, {}
+
+    def step_baseline(self, action):
+        if action is not None:
+            simulation = self.tokens[action[0]].simulation(self.env, {'task': action[1],
+                                                                     'resource': action[2]})
+            self.env.process(simulation)
+        self.next_decision_moment(action)
+
+        reward = 0
+        # Gather rewards
+        for trace_id, cycle_time in self.simulation_process.traces['ended']:
+            if trace_id not in self.completed_traces:
+                self.completed_traces.append(trace_id)
+                reward += 1 / (1 + (cycle_time / 3600))
+
+        if len(self.tokens) == 0:
+            isTerminated = True
+        else:
+            isTerminated = False
+
+        self.state = self.get_state()
+        #if DEBUG_PRINT: print('state after', self.state, '\n')
+        return self.state, reward, isTerminated, {}, {}
+
 
     def check_possible_assignments(self, resources_a, tokens):
         possible_tasks = []
