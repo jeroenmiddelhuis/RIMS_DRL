@@ -12,7 +12,7 @@ import random
 
 NAME_LOG = 'slow_server'
 POlICY = 'SPT'
-
+N_SIMULATION = 1
 median_processing_time = {"Activity E": {"R5": 0.97040, "R6": 1.24766}, "Activity F": {"R5": 1.10903, "R6": 2.07944}}
 
 def FIFO(state, tokens):
@@ -23,6 +23,7 @@ def FIFO(state, tokens):
         return (token_id, activity, res)
     else:
         return None
+
 
 def SPT(state, tokens):
     if len(tokens) > 0 and len(state['resource_available']) > 0:
@@ -37,8 +38,8 @@ def SPT(state, tokens):
         return None
 
 
-for i in range(0, 1):
-    env_simulator = gym_env(NAME_LOG, i)
+for i in range(0, N_SIMULATION):
+    env_simulator = gym_env(NAME_LOG, POlICY, i)
     obs = env_simulator.reset()
     isTerminated = False
     ##### simulation #####

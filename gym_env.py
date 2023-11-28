@@ -28,9 +28,10 @@ if __name__ == "__main__":
 
 
 class gym_env(Env):
-    def __init__(self, name_log, i=None) -> None:
+    def __init__(self, name_log, POLICY=None, i=None) -> None:
 
         self.name_log = name_log
+        self.policy = POLICY
         input_file = './example/' + self.name_log + '/input_' + self.name_log + '.json'
         with open(input_file, 'r') as f:
             input_data = json.load(f)
@@ -109,7 +110,7 @@ class gym_env(Env):
         self.simulation_process = SimulationProcess(self.env, self.params)
         self.completed_traces = []
         utility.define_folder_output("output/output_{}".format(self.name_log))
-        f = open("output/output_{}/simulated_log_{}_{}".format(self.name_log, self.name_log, str(self.n_simulation)) + ".csv", 'w')
+        f = open("output/output_{}/simulated_log_{}_{}_{}".format(self.name_log, self.name_log, self.policy,str(self.n_simulation)) + ".csv", 'w')
         writer = csv.writer(f)
         writer.writerow(Buffer(writer).get_buffer_keys())
         net, im, fm = pm4py.read_pnml(self.PATH_PETRINET)
