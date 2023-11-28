@@ -16,7 +16,7 @@ import custom_function as custom
 
 class Token(object):
 
-    def __init__(self, id: int, net: pm4py.objects.petri_net.obj.PetriNet, am: pm4py.objects.petri_net.obj.Marking, params: Parameters, process: SimulationProcess, prefix: Prefix, type: str, writer: csv.writer, parallel_object: ParallelObject, time: float, env, values=None):
+    def __init__(self, id: int, net: pm4py.objects.petri_net.obj.PetriNet, am: pm4py.objects.petri_net.obj.Marking, params: Parameters, process: SimulationProcess, prefix: Prefix, type: str, writer: csv.writer, parallel_object: ParallelObject, time: float, env, calendar, values=None):
         self._id = id
         self._process = process
         self._start_time = params.START_SIMULATION
@@ -38,6 +38,7 @@ class Token(object):
         self._next_activity = self._trans.label
         self._resource_trace = self._process._get_resource_trace()
         self.pr_wip_initial = params.PR_WIP_INITIAL
+        self.calendar = calendar
         self.END = False
 
     def _delete_places(self, places):
@@ -50,9 +51,13 @@ class Token(object):
 
     def inter_trigger_time(self, env, time):
         yield env.timeout(time)
+        time = self._start_time + timedelta(seconds=env.now)
+        #stop = self._process.time_to_next_available_resource(time, env, 'all')
+        #yield env.timeout(stop)
         self._time_last_activity = env.now
         self._process.update_tokens_pending(self)
         self._process._update_state_traces(self._id, env)
+
 
     def simulation(self, env, action): ### action = {task: ... , resource: ....}
         """
@@ -94,7 +99,6 @@ class Token(object):
         self._buffer.set_feature("queue", queue)
         self._buffer.set_feature("enabled_time", self._start_time + timedelta(seconds=env.now))
 
-
         request_resource = resource.request()
         yield request_resource
         self._process.set_actual_assignment(self._id, action['task'], action['resource'])
@@ -110,8 +114,9 @@ class Token(object):
         self._buffer.set_feature("ro_total", self._process.get_occupations_all_role(self._params.RESOURCE_TO_ROLE_LSTM[action['resource']]))
         self._buffer.set_feature("wip_activity", resource_task.count)
 
-        #stop = resource.to_time_schedule(self._start_time + timedelta(seconds=env.now))
-        #yield env.timeout(stop)
+        if self.calendar:
+            stop = resource.to_time_schedule(self._start_time + timedelta(seconds=env.now))
+            yield env.timeout(stop)
         self._buffer.set_feature("start_time", self._start_time + timedelta(seconds=env.now))
         #duration = self.define_processing_time(action['task'])
         #### Add prediction with LSTM model

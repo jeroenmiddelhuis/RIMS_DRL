@@ -1,0 +1,144 @@
+{
+    "start_timestamp": "2011-01-01 06:00:00",
+    "interTriggerTimer": {
+        "type": "custom"
+    },
+    "resource": {
+        "Karen Clarens":{"resources":["Karen Clarens"],"calendar":{"days": [0, 1, 2, 3, 4, 5, 6],"hour_min":0,"hour_max":23}},
+        "Francis Odell":{"resources":["Francis Odell"],"calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}},
+        "Elvira Lores":{"resources":["Elvira Lores"],"calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}},
+        "Esmana Liubiata":{"resources":["Esmana Liubiata"],"calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}},
+        "Alberto Duport":{"resources":["Alberto Duport"],"calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}},
+        "Pedro Alvares":{"resources":["Pedro Alvares"],"calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}},
+        "Karel de Groot":{"resources":["Karel de Groot"],"calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}},
+        "Heinz Gutschmidt":{"resources":["Heinz Gutschmidt"],"calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}},
+        "Kiu Kan":{"resources":["Kiu Kan"],"calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}},
+        "Anna Kaufmann":{"resources":["Anna Kaufmann"],"calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}},
+        "Anne Olwada":{"resources":["Anne Olwada"],"calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}},
+        "Nico Ojenbeer":{"resources":["Nico Ojenbeer"],"calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}},
+        "Christian Francois":{"resources":["Christian Francois"],"calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}},
+        "Clement Duchot":{"resources":["Clement Duchot"],"calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}},
+        "Carmen Finacse":{"resources":["Carmen Finacse"],"calendar":{"days": [0, 1, 2, 3, 4, 5, 6],"hour_min":0,"hour_max":23}},
+        "Kim Passa":{"resources":["Kim Passa"],"calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}},
+        "Fjodor Kowalski":{"resources":["Fjodor Kowalski"],"calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}},
+        "Francois de Perrier":{"resources":["Francois de Perrier"],"calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}},
+        "Maris Freeman":{"resources":["Maris Freeman"],"calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}},
+        "Miu Hanwan":{"resources":["Miu Hanwan"],"calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}},
+        "Karalda Nimwada":{"resources":["Karalda Nimwada"],"calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}},
+        "Magdalena Predutta":{"resources":["Magdalena Predutta"],"calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}},
+        "Immanuel Karagianni":{"resources":["Immanuel Karagianni"],"calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}},
+        "Tesca Lobes":{"resources":["Tesca Lobes"],"calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}},
+        "Esmeralda Clay":{"resources":["Esmeralda Clay"],"calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}},
+        "Penn Osterwalder":{"resources":["Penn Osterwalder"],"calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}},
+        "Sean Manney":{"resources":["Sean Manney"],"calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}
+    },
+    "processing_time": {
+        "Create Purchase Requisition":  {
+            "name": "custom"
+        },
+        "Create Request for Quotation":  {
+            "name": "custom"
+        },
+        "Analyze Request for Quotation":  {
+            "name": "custom"
+        },
+        "Send Request for Quotation to Supplier":  {
+            "name": "custom"
+        },
+        "Create Quotation comparison Map":  {
+            "name": "custom"
+        },
+        "Analyze Quotation Comparison Map":  {
+            "name": "custom"
+        },
+        "Choose best option":  {
+            "name": "custom"
+        },
+        "Settle Conditions With Supplier":  {
+            "name": "custom"
+        },
+        "Create Purchase Order":  {
+            "name": "custom"
+        },
+        "Confirm Purchase Order":  {
+            "name": "custom"
+        },
+        "Deliver Goods Services":  {
+            "name": "custom"
+        },
+        "Release Purchase Order":  {
+            "name": "custom"
+        },
+        "Approve Purchase Order for payment":  {
+            "name": "custom"
+        },
+        "Send Invoice":  {
+            "name": "custom"
+        },
+        "Release Supplier's Invoice":  {
+            "name": "custom"
+        },
+        "Authorize Supplier's Invoice payment":  {
+            "name": "custom"
+        },
+        "Pay Invoice":  {
+            "name": "custom"
+        },
+        "Amend Request for Quotation":  {
+            "name": "custom"
+        },
+        "Settle Dispute With Supplier":  {
+            "name": "custom"
+        },
+        "Analyze Purchase Requisition":  {
+            "name": "custom"
+        },
+        "Amend Purchase Requisition":  {
+            "name": "custom"
+        }
+    },
+    "probability": {
+    },
+    "resource_table": [
+        {
+            "role": "Role 1",
+            "task": "A_SUBMITTED"
+        },
+        {
+            "role": "Role 2",
+            "task": "A_PARTLYSUBMITTED"
+        },
+        {
+            "role": "Role 2",
+            "task": "A_PREACCEPTED"
+        },
+        {
+            "role": "Role 1",
+            "task": "A_ACCEPTED"
+        },
+        {
+            "role": "Role 2",
+            "task": "A_FINALIZED"
+        },
+        {
+            "role": "Role 2",
+            "task": "A_CANCELLED"
+        },
+        {
+            "role": "Role 2",
+            "task": "A_DECLINED"
+        },
+        {
+            "role": "Role 2",
+            "task": "A_APPROVED"
+        },
+        {
+            "role": "Role 2",
+            "task": "A_REGISTERED"
+        },
+        {
+            "role": "Role 2",
+            "task": "A_ACTIVATED"
+        }
+    ]
+}

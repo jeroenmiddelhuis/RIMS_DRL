@@ -1,10 +1,22 @@
 {
-    "start_timestamp": "2020-08-17 14:42:03",
+    "start_timestamp": "2020-04-06 08:00:00",
     "interTriggerTimer": {
         "type": "custom"
     },
     "resource": {
-        "MNO-000002": {"resources": ["MNO-000002"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "ABC-000001": {"resources": ["ABC-000001"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "GHI-000003": {"resources": ["GHI-000003"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "JKL-000001": {"resources": ["JKL-000001"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "JKL-000002": {"resources": ["JKL-000002"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "GHI-000001": {"resources": ["GHI-000001"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "DEF-000003": {"resources": ["DEF-000003"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "DEF-000001": {"resources": ["DEF-000001"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "JKL-000003": {"resources": ["JKL-000003"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "MNO-000001": {"resources": ["MNO-000001"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "GHI-000002": {"resources": ["GHI-000002"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "DEF-000002": {"resources": ["DEF-000002"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}, "MNO-000003": {"resources": ["MNO-000003"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}
+        "MNO-000002": {"resources": ["MNO-000002"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}},
+        "ABC-000001": {"resources": ["ABC-000001"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}},
+        "GHI-000003": {"resources": ["GHI-000003"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}},
+        "JKL-000001": {"resources": ["JKL-000001"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}},
+        "JKL-000002": {"resources": ["JKL-000002"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}},
+        "GHI-000001": {"resources": ["GHI-000001"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}},
+        "DEF-000003": {"resources": ["DEF-000003"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}},
+        "DEF-000001": {"resources": ["DEF-000001"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}},
+        "JKL-000003": {"resources": ["JKL-000003"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}},
+        "MNO-000001": {"resources": ["MNO-000001"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}},
+        "GHI-000002": {"resources": ["GHI-000002"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}},
+        "DEF-000002": {"resources": ["DEF-000002"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}},
+        "MNO-000003": {"resources": ["MNO-000003"], "calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}
     },
     "processing_time": {
         "A":  {

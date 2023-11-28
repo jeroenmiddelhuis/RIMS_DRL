@@ -19,6 +19,8 @@ import pm4py
 from numpy import random
 from os.path import exists
 
+CYCLE_TIME_MAX = 8.64e+6
+
 
 DEBUG_PRINT = True
 if __name__ == "__main__":
@@ -41,7 +43,9 @@ class gym_env(Env):
         # The inputs are: 1) resource availability, 2) if a resource is busy, to what task_type, 3) number of tasks for each activity
         self.input = [resource + '_availability' for resource in self.resources] + \
                      [resource + '_to_task_type' for resource in self.resources] + \
-                     [task_type for task_type in self.task_types]
+                     [task_type for task_type in self.task_types]\
+
+                     #+ ['wip', 'day', 'hour']
 
         # The outputs are: the assignments (resource, task_type)
         #self.output = [(resource, task_type) for task_type in self.task_types for resource in self.resources] + ['Postpone']
@@ -53,9 +57,11 @@ class gym_env(Env):
             self.FEATURE_ROLE = 'no_all_role'
         self.PATH_PETRINET = './example/' + self.name_log + '/' + self.name_log + '.pnml'
         PATH_PARAMETERS = input_file
-        self.N_TRACES = 159
+        self.N_TRACES = 100
+        self.CALENDAR = False ## If you want to use calendar or not
         self.PATH_LOG = './example/' + self.name_log + '/' + self.name_log + '.xes'
         self.params = Parameters(PATH_PARAMETERS, self.N_TRACES, self.name_log, self.FEATURE_ROLE)
+
         ### define possible assignments from log
         self.output = self.retrieve_possible_assignments(self.params.RESOURCE_TO_ROLE_LSTM)
 
@@ -83,6 +89,7 @@ class gym_env(Env):
 
     # Reset the environment -> restart simulation
 
+    ## Read log to retrieve the possible assignments
     def retrieve_possible_assignments(self, resources):
         log = pm4py.read_xes(self.PATH_LOG)
         possible_assignment = set()
@@ -113,7 +120,7 @@ class gym_env(Env):
             parallel_object = utility.ParallelObject()
             time_trace = self.env.now
             token = Token(i, net, im, self.params, self.simulation_process, prefix, 'sequential', writer, parallel_object,
-                          time_trace, None)
+                          time_trace, self.CALENDAR, None)
             self.tokens[i] = token
             prev += itime
             self.env.process(token.inter_trigger_time(self.env, itime))
@@ -139,6 +146,7 @@ class gym_env(Env):
             #print('Token pendings', self.simulation_process.tokens_pending)
             #print('Tokens', self.tokens)
 
+        trace_ongoing_prev = dict(self.simulation_process.get_state()['traces']['ongoing'])
         if self.output[action] != 'Postpone':
             token_id = None
             tokens_pending = {k: v for k, v in self.simulation_process.tokens_pending.items() if v[0]._next_activity == self.output[action][1]}
@@ -151,6 +159,18 @@ class gym_env(Env):
             self.env.process(simulation)
         self.next_decision_moment(self.output[action])
 
+        ##### Reward at the end of an assignment
+        '''
+        trace_ongoing_actual = dict(self.simulation_process.get_state()['traces']['ongoing'])
+        reward = 0
+        for key in trace_ongoing_prev:
+            if key in trace_ongoing_actual:
+                reward += 1 - ((trace_ongoing_actual[key] - trace_ongoing_prev[key]) / CYCLE_TIME_MAX)
+        for trace_id, cycle_time in self.simulation_process.traces['ended']:
+            if trace_id not in self.completed_traces:
+                reward += 1 - ((cycle_time - trace_ongoing_prev[trace_id]) / CYCLE_TIME_MAX)
+                self.completed_traces.append(trace_id)
+        '''
         # TODO:
         # Run the simulation to the next decision moment using the chosen action
 
@@ -203,7 +223,7 @@ class gym_env(Env):
                     self.env.step()
             for i in self.tokens:
                 if self.tokens[i].END is True:
-                    if self.tokens[i]._next_activity is None:  ### fine della traccia
+                    if self.tokens[i]._next_activity is None:
                         delete.append(i)
             for e in delete:
                 del self.tokens[e]
@@ -221,6 +241,8 @@ class gym_env(Env):
         else:
             task_types_num = [0 for _ in range(len(self.task_types))]
 
+        #wip = [(len(env_state['traces']['ongoing'])+1)/1000]
+        #time = [(env_state['time'].weekday() + 1)/7, (env_state['time'].hour + 1)/24]
         return resource_available + resource_assigned_to + task_types_num
 
     # Create an action mask which invalidates ineligible actions
