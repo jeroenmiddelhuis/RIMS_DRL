@@ -106,8 +106,10 @@ class RoleSimulator(object):
             stop = timestamp.replace(hour=self._calendar['hour_min'], minute=0, second=0) - timestamp
         else:
             new_day = timestamp.replace(hour=self._calendar['hour_min'], minute=0, second=0) + timedelta(days=1)
-            stop = new_day - timestamp
-        return stop.total_seconds()
+            stop = (new_day - timestamp).total_seconds()
+            if new_day.weekday() not in self._calendar['days']:
+                stop = stop + self._define_stop_weekend(new_day)
+        return stop
 
     def to_time_schedule(self, timestamp):
         """
