@@ -15,7 +15,8 @@ class InterTriggerTimer(object):
         self._process = process
         self._start_time = start
         self._type = params.INTER_TRIGGER['type']
-        self._previous = start
+        self._previous_date = start
+        self._previous = 0
         if self._type == 'distribution':
             """Define the distribution of token arrivals from specified in the file json"""
             self.name_distribution = params.INTER_TRIGGER['name']
@@ -31,15 +32,16 @@ class InterTriggerTimer(object):
             arrival = getattr(np.random, self.name_distribution)(**self.params, size=1)[0]
             if resource._get_calendar():
                 stop = resource.to_time_schedule(self._start_time + timedelta(seconds=env.now + arrival))
-                next = stop + arrival
+                self._interval = stop + arrival
             else:
-                next = arrival
+                self._interval = arrival
         elif self._type == 'custom':
-            self._interval += self.custom_arrival(case, self._previous, name_log)
+            self._interval += self.custom_arrival(case, self._previous_date, name_log)
         else:
             raise ValueError('ERROR: Invalid arrival times generator')
-        self._previous = self._start_time + timedelta(seconds=self._interval)
-        return self._interval
+        self._previous += self._interval
+        self._previous_date = self._start_time + timedelta(seconds=self._interval)
+        return self._previous
 
     def custom_arrival(self, case, previous, name_log):
         """

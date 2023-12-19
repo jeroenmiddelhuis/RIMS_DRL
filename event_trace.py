@@ -64,6 +64,7 @@ class Token(object):
             The main function to handle the simulation of a single trace
         """
         self._process.del_tokens_pending(self._id)
+        self._process.set_actual_assignment(self._id, action['task'], action['resource'])
         if self._prefix.is_empty(): ## no activities already executed
             self._resource_trace_request = self._resource_trace.request()
 
@@ -101,7 +102,6 @@ class Token(object):
 
         request_resource = resource.request()
         yield request_resource
-        self._process.set_actual_assignment(self._id, action['task'], action['resource'])
 
         #single_resource = self._process._set_single_resource(resource._get_name())
         self._buffer.set_feature("resource", resource._get_name())

@@ -16,7 +16,6 @@ import warnings
 import json
 import math
 import pm4py
-from numpy import random
 from os.path import exists
 
 CYCLE_TIME_MAX = 8.64e+6
@@ -49,7 +48,7 @@ class gym_env(Env):
                      #+ ['wip', 'day', 'hour']
 
         # The outputs are: the assignments (resource, task_type)
-        self.output = [(resource, task_type) for task_type in self.task_types for resource in self.resources]# + ['Postpone']
+        self.output = [(resource, task_type) for task_type in self.task_types for resource in self.resources] + ['Postpone']
 
         path_model = './example/' + self.name_log + '/' + self.name_log
         if exists(path_model + '_diapr_meta.json'):
@@ -81,7 +80,6 @@ class gym_env(Env):
         self.action_space = spaces.Discrete(len(self.output))
 
         self.processes = []
-
 
         self.nr_steps = 0
         # TODO:
@@ -150,6 +148,8 @@ class gym_env(Env):
         if self.nr_steps < 20:# % 1 == 0:
             print('Steps:', self.nr_steps)
             print('State:', self.state)
+            print('Action:', self.output[action])
+            print('State simulator:', self.simulation_process.get_state())
 
         trace_ongoing_prev = dict(self.simulation_process.get_state()['traces']['ongoing'])
         if self.output[action] != 'Postpone':
@@ -164,13 +164,7 @@ class gym_env(Env):
             self.env.process(simulation)
             self.next_decision_moment(self.output[action]) #arg not used
         else:
-            state = self.get_state()
-            next_state = state
-            while all(state == next_state):
-                print('before', self.env.now)
-                self.next_decision_moment(self.output[action])
-                print('after', self.env.now)
-                next_state = self.get_state()
+            self.next_decision_moment(self.output[action])
 
         ##### Reward at the end of an assignment
         '''
@@ -239,34 +233,43 @@ class gym_env(Env):
         for action in self.output:
             if action[0] in resources_a:
                 possible_tasks.append(action[1])
-        other_step = True
+        possible_ass = False
         for token in tokens:
             if tokens[token][0]._next_activity in possible_tasks:
-                other_step = False
-        return other_step
+                possible_ass = True
+        return possible_ass
+
+    def delete_tokens_ended(self):
+        delete = []
+        for i in self.tokens:  ### update tokens ended
+            if self.tokens[i].END is True:
+                if self.tokens[i]._next_activity is None:
+                    delete.append(i)
+        for e in delete:
+            del self.tokens[e]
+
 
     def next_decision_moment(self, action):
-        not_resource_available = True
-        if self.env.peek() == math.inf:
-            not_resource_available = False
-        else:
-            self.env.step()
-        while not_resource_available:
-            delete = []
-            state = self.simulation_process.get_state()
-            if not self.check_possible_assignments(state['resource_available'], self.simulation_process.tokens_pending):
-                not_resource_available = False
+        next_step = True
+        pre_state_res = set(self.simulation_process.get_state()['resource_available'])
+        pre_state_tokens = len(self.simulation_process.get_state()['traces']['ongoing'])
+        while next_step:
+            if self.env.peek() == math.inf:
+                next_step = False
             else:
-                if self.env.peek() == math.inf:
-                    not_resource_available = False
-                else:
-                    self.env.step()
-            for i in self.tokens:
-                if self.tokens[i].END is True:
-                    if self.tokens[i]._next_activity is None:
-                        delete.append(i)
-            for e in delete:
-                del self.tokens[e]
+                self.env.step()
+            actual_state = self.simulation_process.get_state()
+            state_res = set(actual_state['resource_available'])
+            state_tokens = len(actual_state['traces']['ongoing'])
+            ### exception case: all available resources and all tokens already arrived
+            if (state_tokens+len(actual_state['traces']['ended'])) == self.params.TRACES and len(actual_state['resource_anvailable'])==0:
+                next_step = False  ### todo better
+            if pre_state_res != state_res or state_tokens > pre_state_tokens: ### state changed
+                if self.check_possible_assignments(state_res, self.simulation_process.tokens_pending):
+                    next_step = False
+            pre_state_res = state_res
+            pre_state_tokens = state_tokens
+            self.delete_tokens_ended()
 
     def get_state(self):
         env_state = self.simulation_process.get_state()
@@ -280,7 +283,6 @@ class gym_env(Env):
             task_types_num = [min(1.0, sum([1 if self.simulation_process.tokens_pending[token][0]._next_activity == task_type else 0 for token in self.simulation_process.tokens_pending])/100) for task_type in self.task_types]
         else:
             task_types_num = [0.0 for _ in range(len(self.task_types))]
-
         #wip = [(len(env_state['traces']['ongoing'])+1)/1000]
         #time = [(env_state['time'].weekday() + 1)/7, (env_state['time'].hour + 1)/24]
         return np.array(resource_available + resource_assigned_to + task_types_num)
@@ -294,7 +296,7 @@ class gym_env(Env):
                 if self.state[self.input.index(resource + '_availability')] > 0 and self.state[self.input.index(task_type)] > 0:
                     if (resource, task_type) in self.output:
                         mask[self.output.index((resource, task_type))] = 1
-        #mask[-1] = 1 # Postpone always possible
+        mask[-1] = 1 # Postpone always possible
 
         return list(map(bool, mask))
 
