@@ -59,7 +59,7 @@ class gym_env(Env):
             self.FEATURE_ROLE = None
         self.PATH_PETRINET = './example/' + self.name_log + '/' + self.name_log + '.pnml'
         PATH_PARAMETERS = input_file
-        self.N_TRACES = 500
+        self.N_TRACES = 2000
         self.CALENDAR = False ## If you want to use calendar or not
         self.PATH_LOG = './example/' + self.name_log + '/' + self.name_log + '.xes'
         self.params = Parameters(PATH_PARAMETERS, self.N_TRACES, self.name_log, self.FEATURE_ROLE)
@@ -82,12 +82,11 @@ class gym_env(Env):
         self.processes = []
 
         self.nr_steps = 0
-        # TODO:
-        # Please check if this is the correct way to create the simulation environment
+        self.nr_postpone = 0
+
         warnings.filterwarnings("ignore")
 
-        # TODO:
-        # Run simulation to first decision moment
+
 
     # Reset the environment -> restart simulation
 
@@ -120,14 +119,15 @@ class gym_env(Env):
         for i in range(0, self.N_TRACES):
             prefix = Prefix()
             itime = interval.get_next_arrival(self.env, i, self.name_log)
+            prev = itime
             parallel_object = utility.ParallelObject()
             time_trace = self.env.now
             token = Token(i, net, im, self.params, self.simulation_process, prefix, 'sequential', writer, parallel_object,
-                          time_trace, self.CALENDAR, None)
+                          itime, self.CALENDAR, None)
             self.tokens[i] = token
-            prev += itime
+            #prev += itime
             self.env.process(token.inter_trigger_time(self.env, itime))
-
+            
         not_token_ready = True
         while not_token_ready:
             if len(self.simulation_process.tokens_pending) > 0:
@@ -142,14 +142,18 @@ class gym_env(Env):
     # Take an action at every timestep and evaluate this action in the simulator
     def step(self, action):
         state = self.get_state()
+        if self.output[action] == 'Postpone':
+            self.nr_postpone += 1
         # print('State at start:', state, all(self.state == state))
         # print('Action:', action, self.output[action], self.env.now)
         self.nr_steps += 1
-        if self.nr_steps < 20:# % 1 == 0:
+        if self.nr_steps % 2000 == 0:
             print('Steps:', self.nr_steps)
-            print('State:', self.state)
-            print('Action:', self.output[action])
-            print('State simulator:', self.simulation_process.get_state())
+            print('State', self.get_state())
+            print('Postpone actions:', self.nr_postpone, '/2000')
+            #print('State simulator:', self.simulation_process.get_state())
+
+            self.nr_postpone = 0
 
         trace_ongoing_prev = dict(self.simulation_process.get_state()['traces']['ongoing'])
         if self.output[action] != 'Postpone':
@@ -186,7 +190,7 @@ class gym_env(Env):
         for trace_id, cycle_time in self.simulation_process.traces['ended']:
             if trace_id not in self.completed_traces:
                 self.completed_traces.append(trace_id)
-                reward += 1 / (1 + (cycle_time/3600))
+                reward += 1 / (1 + (cycle_time))
 
         # TODO:
         # Add information of the simulation that says when an episode is finished (i.e., SIM_TIME is reached)
@@ -195,13 +199,14 @@ class gym_env(Env):
         if len(self.tokens) == 0:
             isTerminated = True
             print('Mean cycle time:', np.mean([cycle_time for (trace_id, cycle_time) in self.simulation_process.traces['ended']]))
-            print('Total reward:', sum([1 / (1 + (cycle_time/3600)) for (trace_id, cycle_time) in self.simulation_process.traces['ended']]))      
+            print('Total reward:', sum([1 / (1 + (cycle_time)) for (trace_id, cycle_time) in self.simulation_process.traces['ended']]))      
         else:
             isTerminated = False
 
         self.state = self.get_state()
         #print('State at end:', self.state, '\n')
         #if DEBUG_PRINT: print('state after', self.state, '\n')
+        #print(self.simulation_process.traces)
         return self.state, reward, isTerminated, {}, {}
 
     def step_baseline(self, action):

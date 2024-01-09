@@ -118,7 +118,7 @@ def custom_processing_time(buffer: Buffer):
     processing_time = {"Activity E": {"R5": 1.4, "R6": 1.8}, "Activity F": {"R5": 1.6, "R6": 3.0}}
     task = buffer.get_feature("activity")
     resource = buffer.get_feature("resource")
-    duration = np.random.exponential(processing_time[task][resource], 1)[0]*60
+    duration = np.random.exponential(processing_time[task][resource], 1)[0]
     return duration
 
 

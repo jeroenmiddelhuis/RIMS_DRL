@@ -4,7 +4,7 @@
         "type": "distribution",
         "name": "exponential",
         "parameters": {
-            "scale": 10
+            "scale": 2
         }
     },
     "resource": {

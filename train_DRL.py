@@ -28,8 +28,8 @@ from callbacks import custom_schedule, linear_schedule
 class CustomPolicy(MaskableActorCriticPolicy):
     def __init__(self, *args, **kwargs):
         super(CustomPolicy, self).__init__(*args, **kwargs,
-                                           net_arch=[dict(pi=[64, 64],
-                                                          vf=[64, 64])])
+                                           net_arch=[dict(pi=[128, 128],
+                                                          vf=[128, 128])])
 
 NAME_LOG = 'slow_server'
 
@@ -42,7 +42,7 @@ if __name__ == '__main__':
     load_model = False
     postpone_penalty = 0
     time_steps = 5e6
-    n_steps = 5000# Number of steps for each network update
+    n_steps = 25600# Number of steps for each network update
     # Create log dir
     now = datetime.datetime.now()
     log_dir = f"tmp/{NAME_LOG}_{now.year}_{now.month}_{now.day}_{now.hour}_{now.minute}/"  # Logging training results
@@ -57,7 +57,7 @@ if __name__ == '__main__':
     env = Monitor(env_simulator, log_dir)
 
     # Create the model
-    model = MaskablePPO(CustomPolicy, env_simulator, clip_range=0.1, learning_rate=3e-4, n_steps=int(n_steps), batch_size=256, gamma=0.999, verbose=1)
+    model = MaskablePPO(CustomPolicy, env_simulator, clip_range=0.2, learning_rate=3e-5, n_steps=int(n_steps), batch_size=256, gamma=0.999, verbose=1)
 
     #Logging to tensorboard. To access tensorboard, open a bash terminal in the projects directory, activate the environment (where tensorflow should be installed) and run the command in the following line
     # tensorboard --logdir ./tmp/
