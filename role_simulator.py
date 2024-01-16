@@ -103,7 +103,7 @@ class RoleSimulator(object):
 
     def _define_stop_week(self, timestamp):
         if timestamp.hour < self._calendar['hour_min']:
-            stop = timestamp.replace(hour=self._calendar['hour_min'], minute=0, second=0) - timestamp
+            stop = (timestamp.replace(hour=self._calendar['hour_min'], minute=0, second=0) - timestamp).total_seconds()
         else:
             new_day = timestamp.replace(hour=self._calendar['hour_min'], minute=0, second=0) + timedelta(days=1)
             stop = (new_day - timestamp).total_seconds()
@@ -122,7 +122,7 @@ class RoleSimulator(object):
             stop = self._define_stop_week(timestamp)
         else:
             stop = 0
-        return int(stop)
+        return stop
 
     def _split_week(self, timestamp, duration):
         before = (timestamp.replace(hour=self._calendar['hour_max'], minute=0, second=0) - timestamp).seconds

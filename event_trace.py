@@ -16,7 +16,8 @@ import custom_function as custom
 
 class Token(object):
 
-    def __init__(self, id: int, net: pm4py.objects.petri_net.obj.PetriNet, am: pm4py.objects.petri_net.obj.Marking, params: Parameters, process: SimulationProcess, prefix: Prefix, type: str, writer: csv.writer, parallel_object: ParallelObject, time: float, env, calendar, values=None):
+    def __init__(self, id: int, net: pm4py.objects.petri_net.obj.PetriNet, am: pm4py.objects.petri_net.obj.Marking, params: Parameters, process: SimulationProcess, prefix: Prefix, type: str,
+                 writer: csv.writer, parallel_object: ParallelObject, time: float, env, calendar, values=None):
         self._id = id
         self._process = process
         self._start_time = params.START_SIMULATION
@@ -37,6 +38,7 @@ class Token(object):
         self._trans = self.next_transition() ## next activity to perform for the trace
         self._next_activity = self._trans.label
         self._resource_trace = self._process._get_resource_trace()
+        self.env = env
         #self.pr_wip_initial = params.PR_WIP_INITIAL
         self.calendar = calendar
         self.END = False
@@ -49,17 +51,19 @@ class Token(object):
                     delete.append(p)
         return delete
 
-    def inter_trigger_time(self, env, time):
-        yield env.timeout(time)
-        time = self._start_time + timedelta(seconds=env.now)
-        #stop = self._process.time_to_next_available_resource(time, env, 'all')
-        #yield env.timeout(stop)
-        self._time_last_activity = env.now
+    def inter_trigger_time(self, time):
+        yield self.env.timeout(time)
+        time = self._start_time + timedelta(seconds=self.env.now)
+        self._time_last_activity = self.env.now
         self._process.update_tokens_pending(self)
-        self._process._update_state_traces(self._id, env)
+        self._process._update_state_traces(self._id, self.env)
+
+    def update_time_after_postpone(self, time):
+        yield self.env.timeout(time)
+        self._process.update_kpi_trace(self._id, self.env.now)
 
 
-    def simulation(self, env, action): ### action = {task: ... , resource: ....}
+    def simulation(self, action): ### action = {task: ... , resource: ....}
         """
             The main function to handle the simulation of a single trace
         """
@@ -71,10 +75,10 @@ class Token(object):
         self._buffer.reset()
         self._buffer.set_feature("id_case", self._id)
         self._buffer.set_feature("activity", action['task'])
-        self._buffer.set_feature("prefix", self._prefix.get_prefix(self._start_time + timedelta(seconds=env.now)))
+        self._buffer.set_feature("prefix", self._prefix.get_prefix(self._start_time + timedelta(seconds=self.env.now)))
         self._buffer.set_feature("attribute_event", custom.event_function_attribute(self._id,
                                                                                     self._start_time + timedelta(
-                                                              seconds=env.now)))
+                                                              seconds=self.env.now)))
         self._buffer.set_feature("wip_wait", 0 if type != 'sequential' else self._resource_trace.count-1)
         self._buffer.set_feature("wip_wait", self._resource_trace.count)
         #waiting = self.define_waiting_time(action['task'])
@@ -98,7 +102,7 @@ class Token(object):
 
         queue = 0 if len(resource._queue) == 0 else len(resource._queue[-1])
         self._buffer.set_feature("queue", queue)
-        self._buffer.set_feature("enabled_time", self._start_time + timedelta(seconds=env.now))
+        self._buffer.set_feature("enabled_time", self._start_time + timedelta(seconds=self.env.now))
 
         request_resource = resource.request()
         yield request_resource
@@ -115,9 +119,9 @@ class Token(object):
         self._buffer.set_feature("wip_activity", resource_task.count)
 
         if self.calendar:
-            stop = resource.to_time_schedule(self._start_time + timedelta(seconds=env.now))
-            yield env.timeout(stop)
-        self._buffer.set_feature("start_time", self._start_time + timedelta(seconds=env.now))
+            stop = resource.to_time_schedule(self._start_time + timedelta(seconds=self.env.now))
+            yield self.env.timeout(stop)
+        self._buffer.set_feature("start_time", self._start_time + timedelta(seconds=self.env.now))
         #duration = self.define_processing_time(action['task'])
         #### Add prediction with LSTM model
         #transition = (self._params.INDEX_AC[action['task']], self._params.RESOURCE_TO_ROLE_LSTM[action['resource']])
@@ -128,29 +132,28 @@ class Token(object):
         #duration = self._process.get_predict_processing(str(self._id), pr_wip, transition,
         #                                                ac_wip, ro_single, self._start_time + timedelta(seconds=env.now))
         duration = self.call_custom_processing_time()
-        yield env.timeout(duration)
+        yield self.env.timeout(duration)
         self._buffer.set_feature("wip_end", self._resource_trace.count)
-        self._buffer.set_feature("end_time", self._start_time + timedelta(seconds=env.now))
+        self._buffer.set_feature("end_time", self._start_time + timedelta(seconds=self.env.now))
         self._buffer.set_feature("queue", duration)
         self._prefix.add_activity(action['task'])
-        self._buffer.print_values()
+        #self._buffer.print_values()
         resource.release(request_resource)
         self._process._release_single_resource(self._id, resource._get_name(), action['task'])
         resource_task.release(resource_task_request)
 
-        actual_time = env.now - self._start_trace
-        self._process.update_kpi_trace(self._id, actual_time)
+        self._process.update_kpi_trace(self._id, self.env.now)
 
         self._update_marking(self._trans)
-        self._trans = self.next_transition(env)
+        self._trans = self.next_transition(self.env)
         if self._trans is not None:
             self._next_activity = self._trans.label
         else:
             self._next_activity = None
-        self._time_last_activity = env.now
+        self._time_last_activity = self.env.now
         if self._trans is None:  ### End of TRACE
             self._resource_trace.release(self._resource_trace_request)
-            total_time = env.now - self._start_trace
+            total_time = self.env.now - self._start_trace
             self._process._release_resource_trace(self._id, total_time, resource_task)
             self.END = True
         else:

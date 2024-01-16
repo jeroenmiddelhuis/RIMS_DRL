@@ -7,6 +7,7 @@ import simpy
 from role_simulator import RoleSimulator
 import math
 from parameters import Parameters
+from datetime import datetime, timedelta
 from call_LSTM import Predictor
 
 
@@ -143,4 +144,3 @@ class SimulationProcess(object):
 
     def get_predict_processing(self, cid, pr_wip, transition, ac_wip, rp_oc, time):
         return self.predictor.processing_time(cid, pr_wip, transition, ac_wip, rp_oc, time)
-

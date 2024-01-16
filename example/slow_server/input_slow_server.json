@@ -5,6 +5,11 @@
         "name": "exponential",
         "parameters": {
             "scale": 2
+        },
+        "calendar": {
+                "days": [0, 1, 2, 3, 4, 5, 6],
+                "hour_min": 10,
+                "hour_max": 17
         }
     },
     "resource": {
@@ -12,16 +17,16 @@
             "resources": ["R5"],
             "calendar": {
                 "days": [0, 1, 2, 3, 4, 5, 6],
-                "hour_min": 0,
-                "hour_max": 23
+                "hour_min": 10,
+                "hour_max": 17
             }
         },
         "R6": {
             "resources": ["R6"],
             "calendar": {
                 "days": [0, 1, 2, 3, 4, 5, 6],
-                "hour_min": 0,
-                "hour_max": 23
+                "hour_min": 10,
+                "hour_max": 17
             }
         }
     },

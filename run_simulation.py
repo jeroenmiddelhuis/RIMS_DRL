@@ -40,7 +40,7 @@ def setup(env: simpy.Environment, PATH_PETRINET, params, i, NAME):
 
 
 def run_simulation(PATH_PETRINET, PATH_PARAMETERS, N_SIMULATION, N_TRACES, NAME):
-    params = Parameters(PATH_PARAMETERS, N_TRACES)
+    params = Parameters(PATH_PARAMETERS, N_TRACES, NAME)
     for i in range(0, N_SIMULATION):
         env = simpy.Environment()
         env.process(setup(env, PATH_PETRINET, params, i, NAME))
@@ -53,7 +53,8 @@ def run_simulation(PATH_PETRINET, PATH_PARAMETERS, N_SIMULATION, N_TRACES, NAME)
 PATH_PETRINET = 'example/RL_integration/bpi2012.pnml'
 PATH_PARAMETERS = 'example/RL_integration/input.json'
 N_TRACES = 5
-NAME = 'output_RL_integration'
+OUTPUT = 'output_RL_integration'
+NAME = 'RL_integration'
 N_SIMULATION = 1
 
 if __name__ == "__main__":

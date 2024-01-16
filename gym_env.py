@@ -60,7 +60,7 @@ class gym_env(Env):
         self.PATH_PETRINET = './example/' + self.name_log + '/' + self.name_log + '.pnml'
         PATH_PARAMETERS = input_file
         self.N_TRACES = 2000
-        self.CALENDAR = False ## If you want to use calendar or not
+        self.CALENDAR = True ## "True" If you want to use calendar, "False" otherwise
         self.PATH_LOG = './example/' + self.name_log + '/' + self.name_log + '.xes'
         self.params = Parameters(PATH_PARAMETERS, self.N_TRACES, self.name_log, self.FEATURE_ROLE)
 
@@ -108,25 +108,25 @@ class gym_env(Env):
         self.env = simpy.Environment()
         self.simulation_process = SimulationProcess(self.env, self.params)
         self.completed_traces = []
-        utility.define_folder_output("output/output_{}".format(self.name_log))
-        f = open("output/output_{}/simulated_log_{}_{}_{}".format(self.name_log, self.name_log, self.policy,str(self.n_simulation)) + ".csv", 'w')
-        writer = csv.writer(f)
-        writer.writerow(Buffer(writer).get_buffer_keys())
+        #utility.define_folder_output("output/output_{}".format(self.name_log))
+        #f = open("output/output_{}/simulated_log_{}_{}_{}".format(self.name_log, self.name_log, self.policy,str(self.n_simulation)) + ".csv", 'w')
+        #writer = csv.writer(f)
+        #writer.writerow(Buffer(writer).get_buffer_keys())
         net, im, fm = pm4py.read_pnml(self.PATH_PETRINET)
         interval = InterTriggerTimer(self.params, self.simulation_process, self.params.START_SIMULATION)
         self.tokens = {}
         prev = 0
         for i in range(0, self.N_TRACES):
             prefix = Prefix()
-            itime = interval.get_next_arrival(self.env, i, self.name_log)
+            itime = interval.get_next_arrival(self.env, i, self.name_log, self.CALENDAR)
             prev = itime
             parallel_object = utility.ParallelObject()
             time_trace = self.env.now
-            token = Token(i, net, im, self.params, self.simulation_process, prefix, 'sequential', writer, parallel_object,
-                          itime, self.CALENDAR, None)
+            token = Token(i, net, im, self.params, self.simulation_process, prefix, 'sequential', None, parallel_object,
+                          itime, self.env, self.CALENDAR, None)
             self.tokens[i] = token
             #prev += itime
-            self.env.process(token.inter_trigger_time(self.env, itime))
+            self.env.process(token.inter_trigger_time(itime))
             
         not_token_ready = True
         while not_token_ready:
@@ -151,11 +151,10 @@ class gym_env(Env):
             print('Steps:', self.nr_steps)
             print('State', self.get_state())
             print('Postpone actions:', self.nr_postpone, '/2000')
-            #print('State simulator:', self.simulation_process.get_state())
 
-            self.nr_postpone = 0
+            #self.nr_postpone = 0
 
-        trace_ongoing_prev = dict(self.simulation_process.get_state()['traces']['ongoing'])
+        #trace_ongoing_prev = dict(self.simulation_process.get_state()['traces']['ongoing'])
         if self.output[action] != 'Postpone':
             token_id = None
             tokens_pending = {k: v for k, v in self.simulation_process.tokens_pending.items() if v[0]._next_activity == self.output[action][1]}
@@ -163,10 +162,15 @@ class gym_env(Env):
                 token_id = max(tokens_pending.items(), key=lambda x: x[1][1])[0]
             else:
                 token_id = list(tokens_pending.keys())[0]
-            simulation = self.tokens[token_id].simulation(self.env, {'task': self.output[action][1],
+            simulation = self.tokens[token_id].simulation({'task': self.output[action][1],
                                                                      'resource': self.output[action][0]})
             self.env.process(simulation)
             self.next_decision_moment(self.output[action]) #arg not used
+        elif self.check_exception_postpone(): ### exception case: all available resources and all tokens already arrived
+            for token in self.simulation_process.tokens_pending:
+                wait = self.simulation_process.tokens_pending[token][0].update_time_after_postpone(5)
+                self.env.process(wait)
+            self.handle_postpone_exception()
         else:
             self.next_decision_moment(self.output[action])
 
@@ -253,6 +257,26 @@ class gym_env(Env):
         for e in delete:
             del self.tokens[e]
 
+    def check_exception_postpone(self):
+        actual_state = self.simulation_process.get_state()
+        state_tokens = len(actual_state['traces']['ongoing'])
+        ### exception case: all available resources and all tokens already arrived
+        if (state_tokens + len(actual_state['traces']['ended'])) == self.params.TRACES and len(actual_state['resource_anvailable']) == 0:
+            return True
+        else:
+            return False
+
+    def handle_postpone_exception(self):
+        pre_cycle_time = self.simulation_process.get_state()['traces']['ongoing'].copy()
+        next_step = True
+        while next_step:
+            if self.env.peek() == math.inf:
+                next_step = False
+            else:
+                self.env.step()
+            actual_state = self.simulation_process.get_state()['traces']['ongoing']
+            if not bool(set(pre_cycle_time) & set(actual_state)):
+                next_step = False
 
     def next_decision_moment(self, action):
         next_step = True
@@ -266,9 +290,6 @@ class gym_env(Env):
             actual_state = self.simulation_process.get_state()
             state_res = set(actual_state['resource_available'])
             state_tokens = len(actual_state['traces']['ongoing'])
-            ### exception case: all available resources and all tokens already arrived
-            if (state_tokens+len(actual_state['traces']['ended'])) == self.params.TRACES and len(actual_state['resource_anvailable'])==0:
-                next_step = False  ### todo better
             if pre_state_res != state_res or state_tokens > pre_state_tokens: ### state changed
                 if self.check_possible_assignments(state_res, self.simulation_process.tokens_pending):
                     next_step = False

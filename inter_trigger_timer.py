@@ -23,14 +23,14 @@ class InterTriggerTimer(object):
             self.params = params.INTER_TRIGGER['parameters']
         self._interval = 0
 
-    def get_next_arrival(self, env, case, name_log):
+    def get_next_arrival(self, env, case, name_log, calendar):
         """Generate a new arrival from the distribution and check if the new token arrival is inside calendar,
         otherwise wait for a suitable time."""
         next = 0
         if self._type == 'distribution':
             resource = self._process._get_resource('TRIGGER_TIMER')
             arrival = getattr(np.random, self.name_distribution)(**self.params, size=1)[0]
-            if resource._get_calendar():
+            if calendar and resource._get_calendar():
                 stop = resource.to_time_schedule(self._start_time + timedelta(seconds=env.now + arrival))
                 self._interval = stop + arrival
             else:
