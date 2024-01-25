@@ -1,5 +1,6 @@
 {
     "start_timestamp": "2011-01-01 06:00:00",
+    "traces": 608,
     "interTriggerTimer": {
         "type": "custom"
     },

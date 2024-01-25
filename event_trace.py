@@ -39,7 +39,7 @@ class Token(object):
         self._next_activity = self._trans.label
         self._resource_trace = self._process._get_resource_trace()
         self.env = env
-        #self.pr_wip_initial = params.PR_WIP_INITIAL
+        self.pr_wip_initial = params.PR_WIP_INITIAL
         self.calendar = calendar
         self.END = False
 
@@ -88,7 +88,7 @@ class Token(object):
         ### define resource for activity
         resource = self._process._get_resource(action['resource'])
         self._buffer.set_feature("ro_single", self._process.get_occupations_single_role(resource._get_name()))
-        #self._buffer.set_feature("ro_total", self._process.get_occupations_all_role(self._params.RESOURCE_TO_ROLE_LSTM[action['resource']]))
+        self._buffer.set_feature("ro_total", self._process.get_occupations_all_role(self._params.RESOURCE_TO_ROLE_LSTM[action['resource']]))
         self._buffer.set_feature("role", resource._get_name())
 
         self._buffer.set_feature("ro_single", self._process.get_occupations_single_role(resource._get_name()))
@@ -124,14 +124,14 @@ class Token(object):
         self._buffer.set_feature("start_time", self._start_time + timedelta(seconds=self.env.now))
         #duration = self.define_processing_time(action['task'])
         #### Add prediction with LSTM model
-        #transition = (self._params.INDEX_AC[action['task']], self._params.RESOURCE_TO_ROLE_LSTM[action['resource']])
-        #ro_single = self._process.get_occupations_all_role(self._params.RESOURCE_TO_ROLE_LSTM[action['resource']])
-        #pr_wip = self.pr_wip_initial + self._resource_trace.count
-        #initial_ac_wip = self._params.AC_WIP_INITIAL[action['task']]
-        #ac_wip = initial_ac_wip + resource_task.count
-        #duration = self._process.get_predict_processing(str(self._id), pr_wip, transition,
-        #                                                ac_wip, ro_single, self._start_time + timedelta(seconds=env.now))
-        duration = self.call_custom_processing_time()
+        transition = (self._params.INDEX_AC[action['task']], self._params.RESOURCE_TO_ROLE_LSTM[action['resource']])
+        ro_single = self._process.get_occupations_all_role(self._params.RESOURCE_TO_ROLE_LSTM[action['resource']])
+        pr_wip = self.pr_wip_initial + self._resource_trace.count
+        initial_ac_wip = self._params.AC_WIP_INITIAL[action['task']]
+        ac_wip = initial_ac_wip + resource_task.count
+        duration = self._process.get_predict_processing(str(self._id), pr_wip, transition,
+                                                        ac_wip, ro_single, self._start_time + timedelta(seconds=self.env.now))
+        #duration = self.call_custom_processing_time()
         yield self.env.timeout(duration)
         self._buffer.set_feature("wip_end", self._resource_trace.count)
         self._buffer.set_feature("end_time", self._start_time + timedelta(seconds=self.env.now))

@@ -48,7 +48,7 @@ class gym_env(Env):
                      #+ ['wip', 'day', 'hour']
 
         # The outputs are: the assignments (resource, task_type)
-        self.output = [(resource, task_type) for task_type in self.task_types for resource in self.resources] + ['Postpone']
+        #self.output = [(resource, task_type) for task_type in self.task_types for resource in self.resources] + ['Postpone']
 
         path_model = './example/' + self.name_log + '/' + self.name_log
         if exists(path_model + '_diapr_meta.json'):
@@ -59,13 +59,13 @@ class gym_env(Env):
             self.FEATURE_ROLE = None
         self.PATH_PETRINET = './example/' + self.name_log + '/' + self.name_log + '.pnml'
         PATH_PARAMETERS = input_file
-        self.N_TRACES = 2000
-        self.CALENDAR = True ## "True" If you want to use calendar, "False" otherwise
+        self.N_TRACES = input_data['traces']
+        self.CALENDAR = False ## "True" If you want to use calendar, "False" otherwise
         self.PATH_LOG = './example/' + self.name_log + '/' + self.name_log + '.xes'
         self.params = Parameters(PATH_PARAMETERS, self.N_TRACES, self.name_log, self.FEATURE_ROLE)
 
         ### define possible assignments from log
-        ###self.output = self.retrieve_possible_assignments(self.params.RESOURCE_TO_ROLE_LSTM)
+        self.output = self.retrieve_possible_assignments(self.params.RESOURCE_TO_ROLE_LSTM)
 
         # Observation space
         lows = np.array([0 for _ in range(len(self.input))])
@@ -97,7 +97,7 @@ class gym_env(Env):
         for index, row in log.iterrows():
             if row['org:resource'] in resources.keys():
                 possible_assignment.add((row['org:resource'], row['concept:name']))
-        return list(possible_assignment)# + ['Postpone']
+        return list(possible_assignment) + ['Postpone']
 
     def reset(self, seed=0):
         self.nr_steps = 0

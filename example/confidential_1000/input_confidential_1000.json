@@ -1,5 +1,6 @@
 {
     "start_timestamp": "2020-04-06 08:00:00",
+    "traces": 159,
     "interTriggerTimer": {
         "type": "custom"
     },

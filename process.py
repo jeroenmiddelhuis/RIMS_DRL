@@ -27,8 +27,8 @@ class SimulationProcess(object):
         self.tokens_pending = {} ### dictionary keyv = id_case, element = tokenOBJ
         self.next_assign = None
 
-        #self.predictor = Predictor((self._params.MODEL_PATH_PROCESSING, self._params.MODEL_PATH_WAITING), self._params)
-        #self.predictor.predict()
+        self.predictor = Predictor((self._params.MODEL_PATH_PROCESSING, self._params.MODEL_PATH_WAITING), self._params)
+        self.predictor.predict()
 
 
     def update_tokens_pending(self, token):
@@ -65,7 +65,7 @@ class SimulationProcess(object):
         occup = []
         if self._params.FEATURE_ROLE == 'all_role':
             for key in self._params.ROLE_CAPACITY_LSTM:
-                if key != 'SYSTEM':
+                if key != 'SYSTEM' and key != 'TRIGGER_TIMER':
                     occup.append(self.get_occupations_single_role_LSTM(key))
         else:
             occup.append(self.get_occupations_single_role_LSTM(role))
@@ -78,7 +78,7 @@ class SimulationProcess(object):
         """
         occup = 0
         for res in self._resources:
-            if self._params.RESOURCE_TO_ROLE_LSTM[res] == role:
+            if res != 'TRIGGER_TIMER' and  self._params.RESOURCE_TO_ROLE_LSTM[res] == role:
                 occup += self._resources[res]._get_resource().count
         occup = occup / self._params.ROLE_CAPACITY_LSTM[role][0]
         return round(occup, 2)

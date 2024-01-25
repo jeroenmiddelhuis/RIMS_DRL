@@ -31,7 +31,7 @@ class CustomPolicy(MaskableActorCriticPolicy):
                                            net_arch=[dict(pi=[128, 128],
                                                           vf=[128, 128])])
 
-NAME_LOG = 'slow_server'
+NAME_LOG = 'BPI_Challenge_2012_W_Two_TS'
 
 
 if __name__ == '__main__':
