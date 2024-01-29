@@ -59,7 +59,8 @@ class gym_env(Env):
             self.FEATURE_ROLE = None
         self.PATH_PETRINET = './example/' + self.name_log + '/' + self.name_log + '.pnml'
         PATH_PARAMETERS = input_file
-        self.N_TRACES = input_data['traces']
+        #self.N_TRACES = input_data['traces']
+        self.N_TRACES = 2000
         self.CALENDAR = False ## "True" If you want to use calendar, "False" otherwise
         self.PATH_LOG = './example/' + self.name_log + '/' + self.name_log + '.xes'
         self.params = Parameters(PATH_PARAMETERS, self.N_TRACES, self.name_log, self.FEATURE_ROLE)
@@ -113,7 +114,7 @@ class gym_env(Env):
         #writer = csv.writer(f)
         #writer.writerow(Buffer(writer).get_buffer_keys())
         net, im, fm = pm4py.read_pnml(self.PATH_PETRINET)
-        interval = InterTriggerTimer(self.params, self.simulation_process, self.params.START_SIMULATION)
+        interval = InterTriggerTimer(self.params, self.simulation_process, self.params.START_SIMULATION, self.N_TRACES)
         self.tokens = {}
         prev = 0
         for i in range(0, self.N_TRACES):

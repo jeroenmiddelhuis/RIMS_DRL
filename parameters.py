@@ -70,6 +70,8 @@ class Parameters(object):
         self.INTER_SCALER = './example/' + self.NAME_EXP + '/' + self.NAME_EXP + self.prefix[0] + '_inter_scaler.pkl'
         self.END_INTER_SCALER = './example/' + self.NAME_EXP + '/' + self.NAME_EXP + self.prefix[
             0] + '_end_inter_scaler.pkl'
+        self.MODEL_PROPHET = './example/' + self.NAME_EXP + '/' + self.NAME_EXP + '_prf.json'
+        self.METADATA_PROPHET = './example/' + self.NAME_EXP + '/' + self.NAME_EXP + '_prf_meta.json'
 
         if os.path.exists(self.METADATA):
             with open(self.METADATA) as file:
