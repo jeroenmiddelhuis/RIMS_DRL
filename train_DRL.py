@@ -33,6 +33,7 @@ class CustomPolicy(MaskableActorCriticPolicy):
 
 NAME_LOG = 'BPI_Challenge_2017_W_Two_TS'
 
+#### to use BPI_Challenge_2017_W_Two_TS first download the entire log from 'https://drive.google.com/file/d/1juGeinUqaxkLBEmObIBYiRA3NqAMOcoN/view?usp=drive_link' and place it in the folder of the same name inside example
 
 if __name__ == '__main__':
     #if true, load model for a new round of training
