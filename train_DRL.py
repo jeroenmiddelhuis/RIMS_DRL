@@ -39,6 +39,7 @@ if __name__ == '__main__':
     #if true, load model for a new round of training
     
     running_time = 5000
+    N_TRACES = 1000
     num_cpu = 1
     load_model = False
     postpone_penalty = 0
@@ -53,7 +54,7 @@ if __name__ == '__main__':
     #print(f'Training agent for {config_type} with {time_steps} timesteps in updates of {n_steps} steps.')
     # Create and wrap the environment
     # Reward functions: 'AUC', 'case_task'
-    env_simulator = gym_env(NAME_LOG)  # Initialize env
+    env_simulator = gym_env(NAME_LOG, N_TRACES)  # Initialize env
 
     env = Monitor(env_simulator, log_dir)
 
