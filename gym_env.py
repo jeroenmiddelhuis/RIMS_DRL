@@ -101,8 +101,9 @@ class gym_env(Env):
         return list(possible_assignment) + ['Postpone']
 
     def reset(self, seed=0):
-        self.nr_steps = 0
-        print('-------- Reseting environment --------')
+        #self.nr_steps = 0
+        
+        print('-------- Resetting environment --------')
         # TODO:
         # Please have a look if this is a good way to reset the environment.
         # The simulation should restart and run until the first decision moment.
@@ -145,10 +146,11 @@ class gym_env(Env):
         if self.output[action] == 'Postpone':
             self.nr_postpone += 1
         self.nr_steps += 1
-        # if self.nr_steps % 2000 == 0:
-        #     print('Steps:', self.nr_steps)
-        #     print('State', self.get_state())
-        #     print('Postpone actions:', self.nr_postpone, '/2000')
+        if self.nr_steps % 1000 == 0:
+            print('Steps:', self.nr_steps)
+            print('State', self.get_state())
+            print('Postpone actions:', self.nr_postpone, '/1000')
+            self.nr_postpone = 0
 
             #self.nr_postpone = 0
 
@@ -190,12 +192,13 @@ class gym_env(Env):
         for trace_id, cycle_time in self.simulation_process.traces['ended']:
             if trace_id not in self.completed_traces:
                 self.completed_traces.append(trace_id)
-                reward += 1 / (1 + (cycle_time))
+                reward += 1 / (1 + (cycle_time/3600))
 
         if len(self.tokens) == 0:
             isTerminated = True
-            print('Mean cycle time:', np.mean([cycle_time for (trace_id, cycle_time) in self.simulation_process.traces['ended']]))
-            print('Total reward:', sum([1 / (1 + (cycle_time)) for (trace_id, cycle_time) in self.simulation_process.traces['ended']]))      
+            print('Mean cycle time:', np.mean([cycle_time/3600 for (trace_id, cycle_time) in self.simulation_process.traces['ended']]))
+            print('Total reward:', sum([1 / (1 + (cycle_time/3600)) for (trace_id, cycle_time) in self.simulation_process.traces['ended']]))  
+            print([(cycle_time/3600) for (trace_id, cycle_time) in self.simulation_process.traces['ended']])    
         else:
             isTerminated = False
         return self.get_state(), reward, isTerminated, {}, {}
@@ -309,10 +312,10 @@ class gym_env(Env):
                     if (resource, task_type) in self.output:
                         mask[self.output.index((resource, task_type))] = 1
         
-        if len(self.simulation_process.tokens_pending) != 0 and all([state[self.input.index(resource + '_availability')] > 0 for resource in self.resources]):
-            mask[-1] = 1 # Postpone available
-        else:
+        if len(self.simulation_process.tokens_pending) == 0 and all([state[self.input.index(resource + '_availability')] > 0 for resource in self.resources]):
             mask[-1] = 0 # All tokens have arrived and all resources available. State will not change so we mask postpone
+        else:
+            mask[-1] = 1 # Postpone available
 
         return list(map(bool, mask))
 

@@ -31,7 +31,7 @@ class CustomPolicy(MaskableActorCriticPolicy):
                                            net_arch=[dict(pi=[128, 128],
                                                           vf=[128, 128])])
 
-NAME_LOG = 'BPI_Challenge_2017_W_Two_TS'
+NAME_LOG = 'confidential_1000'
 
 #### to use BPI_Challenge_2017_W_Two_TS first download the entire log from 'https://drive.google.com/file/d/1juGeinUqaxkLBEmObIBYiRA3NqAMOcoN/view?usp=drive_link' and place it in the folder of the same name inside example
 
@@ -39,15 +39,15 @@ if __name__ == '__main__':
     #if true, load model for a new round of training
     
     running_time = 5000
-    N_TRACES = 1000
+    N_TRACES = 100
     num_cpu = 1
     load_model = False
     postpone_penalty = 0
-    time_steps = 5e6
-    n_steps = 25600# Number of steps for each network update
+    time_steps = 1280000
+    n_steps = 2560# Number of steps for each network update
     # Create log dir
     now = datetime.datetime.now()
-    log_dir = f"tmp/{NAME_LOG}_{now.year}_{now.month}_{now.day}_{now.hour}_{now.minute}/"  # Logging training results
+    log_dir = f"./tmp/{NAME_LOG}_{now.year}_{now.month}_{now.day}_{now.hour}_{now.minute}/"  # Logging training results
 
     os.makedirs(log_dir, exist_ok=True)
 
