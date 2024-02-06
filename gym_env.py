@@ -100,7 +100,7 @@ class gym_env(Env):
                 possible_assignment.add((row['org:resource'], row['concept:name']))
         return list(possible_assignment) + ['Postpone']
 
-    def reset(self, seed=0):
+    def reset(self, seed=0, i=None):
         #self.nr_steps = 0
         
         print('-------- Resetting environment --------')
@@ -112,8 +112,8 @@ class gym_env(Env):
         self.completed_traces = []
         if self.print:
             utility.define_folder_output("output/output_{}".format(self.name_log))
-            f = open("output/output_{}/simulated_log_{}_{}_{}".format(self.name_log, self.name_log, self.policy,str(self.n_simulation)) + ".csv", 'w')
-            print("output/output_{}/simulated_log_{}_{}_{}".format(self.name_log, self.name_log, self.policy,str(self.n_simulation)) + ".csv")
+            f = open("output/output_{}/simulated_log_{}_{}_{}".format(self.name_log, self.name_log, self.policy,str(i)) + ".csv", 'w')
+            print("output/output_{}/simulated_log_{}_{}_{}".format(self.name_log, self.name_log, self.policy,str(i)) + ".csv")
             writer = csv.writer(f)
             writer.writerow(Buffer(writer).get_buffer_keys())
         else:
