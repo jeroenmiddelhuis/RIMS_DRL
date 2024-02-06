@@ -1,0 +1,1 @@
+Updated masking function. The agent is not allowed to postpone when all tokens have arrived and all resources are available. Changed state slightly.

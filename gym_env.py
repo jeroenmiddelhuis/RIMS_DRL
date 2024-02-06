@@ -44,7 +44,7 @@ class gym_env(Env):
         # The inputs are: 1) resource availability, 2) if a resource is busy, to what task_type, 3) number of tasks for each activity
         self.input = [resource + '_availability' for resource in self.resources] + \
                      [resource + '_to_task_type' for resource in self.resources] + \
-                     [task_type for task_type in self.task_types]\
+                     [task_type for task_type in self.task_types]
                      #+ ['wip', 'day', 'hour']
 
         # The outputs are: the assignments (resource, task_type)
@@ -101,8 +101,9 @@ class gym_env(Env):
         return list(possible_assignment) + ['Postpone']
 
     def reset(self, seed=0):
-        self.nr_steps = 0
-        print('-------- Reseting environment --------')
+        #self.nr_steps = 0
+        
+        print('-------- Resetting environment --------')
         # TODO:
         # Please have a look if this is a good way to reset the environment.
         # The simulation should restart and run until the first decision moment.
@@ -137,8 +138,7 @@ class gym_env(Env):
             if len(self.simulation_process.tokens_pending) > 0:
                 not_token_ready = False
             self.env.step()
-        self.state = self.get_state()
-        return self.state, {}
+        return self.get_state(), {}
 
     #!! The algorithm uses this function to interact with the environment
     # Every step is an observation (state, action, reward) which is used for training
@@ -148,13 +148,12 @@ class gym_env(Env):
         state = self.get_state()
         if self.output[action] == 'Postpone':
             self.nr_postpone += 1
-        # print('State at start:', state, all(self.state == state))
-        # print('Action:', action, self.output[action], self.env.now)
         self.nr_steps += 1
-        if self.nr_steps % 2000 == 0:
+        if self.nr_steps % 1000 == 0:
             print('Steps:', self.nr_steps)
             print('State', self.get_state())
-            print('Postpone actions:', self.nr_postpone, '/2000')
+            print('Postpone actions:', self.nr_postpone, '/1000')
+            self.nr_postpone = 0
 
             #self.nr_postpone = 0
 
@@ -190,32 +189,22 @@ class gym_env(Env):
                 reward += 1 - ((cycle_time - trace_ongoing_prev[trace_id]) / CYCLE_TIME_MAX)
                 self.completed_traces.append(trace_id)
         '''
-        # TODO:
-        # Run the simulation to the next decision moment using the chosen action
-
+        #print(len(self.simulation_process.tokens_pending), len(self.simulation_process.traces['ongoing']), len(self.simulation_process.traces['ended']))
         reward = 0
         # Gather rewards
         for trace_id, cycle_time in self.simulation_process.traces['ended']:
             if trace_id not in self.completed_traces:
                 self.completed_traces.append(trace_id)
-                reward += 1 / (1 + (cycle_time))
+                reward += 1 / (1 + (cycle_time/3600))
 
-        # TODO:
-        # Add information of the simulation that says when an episode is finished (i.e., SIM_TIME is reached)
-        # This flag, isTerminated, is returned after every step
-        # Gym automatically calls the reset() function to start a new episode
         if len(self.tokens) == 0:
             isTerminated = True
-            print('Mean cycle time:', np.mean([cycle_time for (trace_id, cycle_time) in self.simulation_process.traces['ended']]))
-            print('Total reward:', sum([1 / (1 + (cycle_time)) for (trace_id, cycle_time) in self.simulation_process.traces['ended']]))      
+            print('Mean cycle time:', np.mean([cycle_time/3600 for (trace_id, cycle_time) in self.simulation_process.traces['ended']]))
+            print('Total reward:', sum([1 / (1 + (cycle_time/3600)) for (trace_id, cycle_time) in self.simulation_process.traces['ended']]))  
+            print([(cycle_time/3600) for (trace_id, cycle_time) in self.simulation_process.traces['ended']])    
         else:
             isTerminated = False
-
-        self.state = self.get_state()
-        #print('State at end:', self.state, '\n')
-        #if DEBUG_PRINT: print('state after', self.state, '\n')
-        #print(self.simulation_process.traces)
-        return self.state, reward, isTerminated, {}, {}
+        return self.get_state(), reward, isTerminated, {}, {}
 
     def step_baseline(self, action):
         if action is not None:
@@ -234,10 +223,7 @@ class gym_env(Env):
             isTerminated = True
         else:
             isTerminated = False
-
-        self.state = self.get_state()
-        #if DEBUG_PRINT: print('state after', self.state, '\n')
-        return self.state, reward, isTerminated, {}, {}
+        return self.get_state(), reward, isTerminated, {}, {}
 
 
     def check_possible_assignments(self, resources_a, tokens):
@@ -309,7 +295,7 @@ class gym_env(Env):
             resource_assigned_to[self.resources.index(res)] = (self.task_types.index(task_type) + 1) / len(self.task_types)
         
         if len(self.simulation_process.tokens_pending) > 0:
-            task_types_num = [min(1.0, sum([1 if self.simulation_process.tokens_pending[token][0]._next_activity == task_type else 0 for token in self.simulation_process.tokens_pending])/100) for task_type in self.task_types]
+            task_types_num = [min(1.0, sum([1 if self.simulation_process.tokens_pending[token][0]._next_activity == task_type else 0 for token in self.simulation_process.tokens_pending])/10) for task_type in self.task_types]
         else:
             task_types_num = [0.0 for _ in range(len(self.task_types))]
         #wip = [(len(env_state['traces']['ongoing'])+1)/1000]
@@ -318,14 +304,20 @@ class gym_env(Env):
 
     # Create an action mask which invalidates ineligible actions
     def action_masks(self) -> List[bool]:
+        state = self.get_state()
+        
         mask = [0 for _ in range(len(self.output))]
 
         for resource in self.resources:
             for task_type in self.task_types:
-                if self.state[self.input.index(resource + '_availability')] > 0 and self.state[self.input.index(task_type)] > 0:
+                if state[self.input.index(resource + '_availability')] > 0 and state[self.input.index(task_type)] > 0:
                     if (resource, task_type) in self.output:
                         mask[self.output.index((resource, task_type))] = 1
-        mask[-1] = 1 # Postpone always possible
+        
+        if len(self.simulation_process.tokens_pending) == 0 and all([state[self.input.index(resource + '_availability')] > 0 for resource in self.resources]):
+            mask[-1] = 0 # All tokens have arrived and all resources available. State will not change so we mask postpone
+        else:
+            mask[-1] = 1 # Postpone available
 
         return list(map(bool, mask))
 
