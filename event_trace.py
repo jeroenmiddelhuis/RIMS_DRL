@@ -17,7 +17,7 @@ import custom_function as custom
 class Token(object):
 
     def __init__(self, id: int, net: pm4py.objects.petri_net.obj.PetriNet, am: pm4py.objects.petri_net.obj.Marking, params: Parameters, process: SimulationProcess, prefix: Prefix, type: str,
-                 writer: csv.writer, parallel_object: ParallelObject, time: float, env, calendar, values=None):
+                 writer: csv.writer, parallel_object: ParallelObject, time: float, env, calendar, values=None, print=False):
         self._id = id
         self._process = process
         self._start_time = params.START_SIMULATION
@@ -42,6 +42,7 @@ class Token(object):
         self.pr_wip_initial = params.PR_WIP_INITIAL
         self.calendar = calendar
         self.END = False
+        self.print = print
 
     def _delete_places(self, places):
         delete = []
@@ -137,7 +138,8 @@ class Token(object):
         self._buffer.set_feature("end_time", self._start_time + timedelta(seconds=self.env.now))
         self._buffer.set_feature("queue", duration)
         self._prefix.add_activity(action['task'])
-        #self._buffer.print_values()
+        if self.print:
+            self._buffer.print_values()
         resource.release(request_resource)
         self._process._release_single_resource(self._id, resource._get_name(), action['task'])
         resource_task.release(resource_task_request)

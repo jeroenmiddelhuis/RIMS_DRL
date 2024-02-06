@@ -27,10 +27,11 @@ if __name__ == "__main__":
 
 
 class gym_env(Env):
-    def __init__(self, name_log, POLICY=None, i=None) -> None:
+    def __init__(self, name_log, POLICY=None, print=False, i=None) -> None:
 
         self.name_log = name_log
         self.policy = POLICY
+        self.print = print
         input_file = './example/' + self.name_log + '/input_' + self.name_log + '.json'
         with open(input_file, 'r') as f:
             input_data = json.load(f)
@@ -44,7 +45,6 @@ class gym_env(Env):
         self.input = [resource + '_availability' for resource in self.resources] + \
                      [resource + '_to_task_type' for resource in self.resources] + \
                      [task_type for task_type in self.task_types]\
-
                      #+ ['wip', 'day', 'hour']
 
         # The outputs are: the assignments (resource, task_type)
@@ -60,7 +60,7 @@ class gym_env(Env):
         self.PATH_PETRINET = './example/' + self.name_log + '/' + self.name_log + '.pnml'
         PATH_PARAMETERS = input_file
         #self.N_TRACES = input_data['traces']
-        self.N_TRACES = 2000
+        self.N_TRACES = input_data['traces']
         self.CALENDAR = False ## "True" If you want to use calendar, "False" otherwise
         self.PATH_LOG = './example/' + self.name_log + '/' + self.name_log + '.xes'
         self.params = Parameters(PATH_PARAMETERS, self.N_TRACES, self.name_log, self.FEATURE_ROLE)
@@ -109,10 +109,14 @@ class gym_env(Env):
         self.env = simpy.Environment()
         self.simulation_process = SimulationProcess(self.env, self.params)
         self.completed_traces = []
-        #utility.define_folder_output("output/output_{}".format(self.name_log))
-        #f = open("output/output_{}/simulated_log_{}_{}_{}".format(self.name_log, self.name_log, self.policy,str(self.n_simulation)) + ".csv", 'w')
-        #writer = csv.writer(f)
-        #writer.writerow(Buffer(writer).get_buffer_keys())
+        if self.print:
+            utility.define_folder_output("output/output_{}".format(self.name_log))
+            f = open("output/output_{}/simulated_log_{}_{}_{}".format(self.name_log, self.name_log, self.policy,str(self.n_simulation)) + ".csv", 'w')
+            print("output/output_{}/simulated_log_{}_{}_{}".format(self.name_log, self.name_log, self.policy,str(self.n_simulation)) + ".csv")
+            writer = csv.writer(f)
+            writer.writerow(Buffer(writer).get_buffer_keys())
+        else:
+            writer = None
         net, im, fm = pm4py.read_pnml(self.PATH_PETRINET)
         interval = InterTriggerTimer(self.params, self.simulation_process, self.params.START_SIMULATION, self.N_TRACES)
         self.tokens = {}
@@ -123,10 +127,9 @@ class gym_env(Env):
             prev = itime
             parallel_object = utility.ParallelObject()
             time_trace = self.env.now
-            token = Token(i, net, im, self.params, self.simulation_process, prefix, 'sequential', None, parallel_object,
-                          itime, self.env, self.CALENDAR, None)
+            token = Token(i, net, im, self.params, self.simulation_process, prefix, 'sequential', writer, parallel_object,
+                          itime, self.env, self.CALENDAR, None, self.print)
             self.tokens[i] = token
-            #prev += itime
             self.env.process(token.inter_trigger_time(itime))
             
         not_token_ready = True
@@ -216,8 +219,7 @@ class gym_env(Env):
 
     def step_baseline(self, action):
         if action is not None:
-            simulation = self.tokens[action[0]].simulation(self.env, {'task': action[1],
-                                                                     'resource': action[2]})
+            simulation = self.tokens[action[0]].simulation({'task': action[1], 'resource': action[2]})
             self.env.process(simulation)
         self.next_decision_moment(action)
 
