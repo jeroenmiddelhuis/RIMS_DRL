@@ -92,12 +92,12 @@ class SimulationProcess(object):
                 if occup == 1:
                     state['resource_anvailable'].append(res)
                 else:
-                    if self.calendar:  #### check if res is available based on its calendar
-                        stop = self._resources[res].to_time_schedule(self._params.START_SIMULATION + timedelta(seconds=self._env.now))
-                        if stop > 0:
-                            state['resource_anvailable'].append(res)
-                    else:
-                        state['resource_available'].append(res)
+                    #if self.calendar:  #### check if res is available based on its calendar
+                    #    stop = self._resources[res].to_time_schedule(self._params.START_SIMULATION + timedelta(seconds=self._env.now))
+                    #    if stop > 0:
+                    #        state['resource_anvailable'].append(res)
+                    #else:
+                    state['resource_available'].append(res)
 
         state['actual_assignment'] = self._actual_assignment
         state['traces'] = self.traces
@@ -122,6 +122,7 @@ class SimulationProcess(object):
         for i in self.traces["ongoing"]:
             if i[0] == id:
                 tupla = i
+        #previous_time = tupla[1]
         self.traces["ongoing"].remove(tupla)
         self.traces["ended"].append((id, time))
         self._resource_trace.release(request_resource)
@@ -131,6 +132,7 @@ class SimulationProcess(object):
         for i in self.traces["ongoing"]:
             if i[0] == id:
                 tupla = i
+        #previous_time = tupla[1]
         self.traces["ongoing"].remove(tupla)
         self.traces["ongoing"].append((id, time))
 

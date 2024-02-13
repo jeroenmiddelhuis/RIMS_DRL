@@ -69,6 +69,7 @@ class Token(object):
             The main function to handle the simulation of a single trace
         """
         self._process.del_tokens_pending(self._id)
+        start = self.env.now
         self._process.set_actual_assignment(self._id, action['task'], action['resource'])
         if self._prefix.is_empty(): ## no activities already executed
             self._resource_trace_request = self._resource_trace.request()
@@ -122,7 +123,10 @@ class Token(object):
         if self.calendar:
             stop = resource.to_time_schedule(self._start_time + timedelta(seconds=self.env.now))
             yield self.env.timeout(stop)
+        else:
+            stop = 0
         self._buffer.set_feature("start_time", self._start_time + timedelta(seconds=self.env.now))
+
         #duration = self.define_processing_time(action['task'])
         #### Add prediction with LSTM model
         transition = (self._params.INDEX_AC[action['task']], self._params.RESOURCE_TO_ROLE_LSTM[action['resource']])
@@ -144,6 +148,7 @@ class Token(object):
         self._process._release_single_resource(self._id, resource._get_name(), action['task'])
         resource_task.release(resource_task_request)
 
+        cycle_time = self.env.now - start - stop
         self._process.update_kpi_trace(self._id, self.env.now)
 
         self._update_marking(self._trans)

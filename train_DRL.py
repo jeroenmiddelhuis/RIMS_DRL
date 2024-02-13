@@ -54,7 +54,7 @@ if __name__ == '__main__':
     #print(f'Training agent for {config_type} with {time_steps} timesteps in updates of {n_steps} steps.')
     # Create and wrap the environment
     # Reward functions: 'AUC', 'case_task'
-    env_simulator = gym_env(NAME_LOG, N_TRACES, print=True)  # Initialize env
+    env_simulator = gym_env(NAME_LOG, N_TRACES, print=False)  # Initialize env
 
     env = Monitor(env_simulator, log_dir)
 

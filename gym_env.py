@@ -17,6 +17,7 @@ import json
 import math
 import pm4py
 from os.path import exists
+from datetime import datetime, timedelta
 
 CYCLE_TIME_MAX = 8.64e+6
 
@@ -60,7 +61,7 @@ class gym_env(Env):
         self.PATH_PETRINET = './example/' + self.name_log + '/' + self.name_log + '.pnml'
         PATH_PARAMETERS = input_file
         #self.N_TRACES = input_data['traces']
-        self.N_TRACES = 2
+        self.N_TRACES = 2000
         self.CALENDAR = True ## "True" If you want to use calendar, "False" otherwise
         self.PATH_LOG = './example/' + self.name_log + '/' + self.name_log + '.xes'
         self.params = Parameters(PATH_PARAMETERS, self.N_TRACES, self.name_log, self.FEATURE_ROLE)
@@ -130,7 +131,6 @@ class gym_env(Env):
             token = Token(i, net, im, self.params, self.simulation_process, prefix, 'sequential', writer, parallel_object,
                           itime, self.env, self.CALENDAR, None, self.print)
             self.tokens[i] = token
-            print('TOKEN', i, 'ARIRVE: ', itime)
             self.env.process(token.inter_trigger_time(itime))
             
         not_token_ready = True
@@ -156,9 +156,7 @@ class gym_env(Env):
             self.nr_postpone = 0
 
         #trace_ongoing_prev = dict(self.simulation_process.get_state()['traces']['ongoing'])
-        print(self.output[action])
-        print(self.simulation_process.get_state()['traces'])
-        print(self.simulation_process.get_state()['resource_anvailable'])
+        #print(self.output[action], self.simulation_process.get_state()['traces']['ongoing'])
         if self.output[action] != 'Postpone':
             token_id = None
             tokens_pending = {k: v for k, v in self.simulation_process.tokens_pending.items() if v[0]._next_activity == self.output[action][1]}
@@ -306,7 +304,7 @@ class gym_env(Env):
     # Create an action mask which invalidates ineligible actions
     def action_masks(self) -> List[bool]:
         state = self.get_state()
-        
+        state_simulator = self.simulation_process.get_state()
         mask = [0 for _ in range(len(self.output))]
 
         for resource in self.resources:
@@ -315,7 +313,8 @@ class gym_env(Env):
                     if (resource, task_type) in self.output:
                         mask[self.output.index((resource, task_type))] = 1
         
-        if len(self.simulation_process.tokens_pending) == 0 and all([state[self.input.index(resource + '_availability')] > 0 for resource in self.resources]):
+        #if len(self.simulation_process.tokens_pending) == 0 and all([state[self.input.index(resource + '_availability')] > 0 for resource in self.resources]):
+        if len(self.simulation_process.tokens_pending) == (self.N_TRACES-len(state_simulator['traces']['ended'])) and all([state[self.input.index(resource + '_availability')] > 0 for resource in self.resources]):
             mask[-1] = 0 # All tokens have arrived and all resources available. State will not change so we mask postpone
         else:
             mask[-1] = 1 # Postpone available
