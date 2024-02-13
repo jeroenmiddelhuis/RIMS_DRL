@@ -1,5 +1,6 @@
 tmp/
 __pycache__/
+baseline/__pycache__/
 output/
 test.py
 example/BPI_Challenge_2017_W_Two_TS/BPI_Challenge_2017_W_Two_TS.xes
