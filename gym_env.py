@@ -169,11 +169,11 @@ class gym_env(Env):
                                                                      'resource': self.output[action][0]})
             self.env.process(simulation)
             self.next_decision_moment(self.output[action]) #arg not used
-        elif self.check_exception_postpone(): ### exception case: all available resources and all tokens already arrived
-            for token in self.simulation_process.tokens_pending:
-                wait = self.simulation_process.tokens_pending[token][0].update_time_after_postpone(5)
-                self.env.process(wait)
-            self.handle_postpone_exception()
+        # elif self.check_exception_postpone(): ### exception case: all available resources and all tokens already arrived ### ! Remove to disable postpone X seconds
+        #     for token in self.simulation_process.tokens_pending:
+        #         wait = self.simulation_process.tokens_pending[token][0].update_time_after_postpone(5)
+        #         self.env.process(wait)
+        #     self.handle_postpone_exception()
         else:
             self.next_decision_moment(self.output[action])
 
