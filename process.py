@@ -13,7 +13,7 @@ from call_LSTM import Predictor
 
 class SimulationProcess(object):
 
-    def __init__(self, env: simpy.Environment, params: Parameters):
+    def __init__(self, env: simpy.Environment, params: Parameters, calendar):
         self._env = env
         self._params = params
         self._date_start = params.START_SIMULATION
@@ -26,7 +26,7 @@ class SimulationProcess(object):
         self.resources_available = True ### check if there are resource to assign one event
         self.tokens_pending = {} ### dictionary keyv = id_case, element = tokenOBJ
         self.next_assign = None
-
+        self.calendar = calendar
         self.predictor = Predictor((self._params.MODEL_PATH_PROCESSING, self._params.MODEL_PATH_WAITING), self._params)
         self.predictor.predict()
 
@@ -92,7 +92,12 @@ class SimulationProcess(object):
                 if occup == 1:
                     state['resource_anvailable'].append(res)
                 else:
-                    state['resource_available'].append(res)
+                    if self.calendar:  #### check if res is available based on its calendar
+                        stop = self._resources[res].to_time_schedule(self._params.START_SIMULATION + timedelta(seconds=self._env.now))
+                        if stop > 0:
+                            state['resource_anvailable'].append(res)
+                    else:
+                        state['resource_available'].append(res)
 
         state['actual_assignment'] = self._actual_assignment
         state['traces'] = self.traces

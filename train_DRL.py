@@ -31,7 +31,7 @@ class CustomPolicy(MaskableActorCriticPolicy):
                                            net_arch=[dict(pi=[128, 128],
                                                           vf=[128, 128])])
 
-NAME_LOG = 'confidential_1000'
+NAME_LOG = 'BPI_Challenge_2012_W_Two_TS'
 
 #### to use BPI_Challenge_2017_W_Two_TS first download the entire log from 'https://drive.google.com/file/d/1juGeinUqaxkLBEmObIBYiRA3NqAMOcoN/view?usp=drive_link' and place it in the folder of the same name inside example
 
@@ -54,7 +54,7 @@ if __name__ == '__main__':
     #print(f'Training agent for {config_type} with {time_steps} timesteps in updates of {n_steps} steps.')
     # Create and wrap the environment
     # Reward functions: 'AUC', 'case_task'
-    env_simulator = gym_env(NAME_LOG, N_TRACES)  # Initialize env
+    env_simulator = gym_env(NAME_LOG, N_TRACES, print=True)  # Initialize env
 
     env = Monitor(env_simulator, log_dir)
 
