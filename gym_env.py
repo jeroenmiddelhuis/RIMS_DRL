@@ -60,8 +60,8 @@ class gym_env(Env):
         self.PATH_PETRINET = './example/' + self.name_log + '/' + self.name_log + '.pnml'
         PATH_PARAMETERS = input_file
         #self.N_TRACES = input_data['traces']
-        self.N_TRACES = input_data['traces']
-        self.CALENDAR = False ## "True" If you want to use calendar, "False" otherwise
+        self.N_TRACES = 2
+        self.CALENDAR = True ## "True" If you want to use calendar, "False" otherwise
         self.PATH_LOG = './example/' + self.name_log + '/' + self.name_log + '.xes'
         self.params = Parameters(PATH_PARAMETERS, self.N_TRACES, self.name_log, self.FEATURE_ROLE)
 
@@ -88,7 +88,6 @@ class gym_env(Env):
         warnings.filterwarnings("ignore")
 
 
-
     # Reset the environment -> restart simulation
 
     ## Read log to retrieve the possible assignments
@@ -100,7 +99,7 @@ class gym_env(Env):
                 possible_assignment.add((row['org:resource'], row['concept:name']))
         return list(possible_assignment) + ['Postpone']
 
-    def reset(self, seed=0):
+    def reset(self, seed=0, i=None):
         #self.nr_steps = 0
         
         print('-------- Resetting environment --------')
@@ -108,12 +107,12 @@ class gym_env(Env):
         # Please have a look if this is a good way to reset the environment.
         # The simulation should restart and run until the first decision moment.
         self.env = simpy.Environment()
-        self.simulation_process = SimulationProcess(self.env, self.params)
+        self.simulation_process = SimulationProcess(self.env, self.params, self.CALENDAR)
         self.completed_traces = []
         if self.print:
             utility.define_folder_output("output/output_{}".format(self.name_log))
-            f = open("output/output_{}/simulated_log_{}_{}_{}".format(self.name_log, self.name_log, self.policy,str(self.n_simulation)) + ".csv", 'w')
-            print("output/output_{}/simulated_log_{}_{}_{}".format(self.name_log, self.name_log, self.policy,str(self.n_simulation)) + ".csv")
+            f = open("output/output_{}/simulated_log_{}_{}_{}".format(self.name_log, self.name_log, self.policy, str(i)) + ".csv", 'w')
+            print("output/output_{}/simulated_log_{}_{}_{}".format(self.name_log, self.name_log, self.policy, str(i)) + ".csv")
             writer = csv.writer(f)
             writer.writerow(Buffer(writer).get_buffer_keys())
         else:
@@ -131,6 +130,7 @@ class gym_env(Env):
             token = Token(i, net, im, self.params, self.simulation_process, prefix, 'sequential', writer, parallel_object,
                           itime, self.env, self.CALENDAR, None, self.print)
             self.tokens[i] = token
+            print('TOKEN', i, 'ARIRVE: ', itime)
             self.env.process(token.inter_trigger_time(itime))
             
         not_token_ready = True
@@ -155,9 +155,10 @@ class gym_env(Env):
             print('Postpone actions:', self.nr_postpone, '/1000')
             self.nr_postpone = 0
 
-            #self.nr_postpone = 0
-
         #trace_ongoing_prev = dict(self.simulation_process.get_state()['traces']['ongoing'])
+        print(self.output[action])
+        print(self.simulation_process.get_state()['traces'])
+        print(self.simulation_process.get_state()['resource_anvailable'])
         if self.output[action] != 'Postpone':
             token_id = None
             tokens_pending = {k: v for k, v in self.simulation_process.tokens_pending.items() if v[0]._next_activity == self.output[action][1]}
@@ -169,11 +170,11 @@ class gym_env(Env):
                                                                      'resource': self.output[action][0]})
             self.env.process(simulation)
             self.next_decision_moment(self.output[action]) #arg not used
-        # elif self.check_exception_postpone(): ### exception case: all available resources and all tokens already arrived ### ! Remove to disable postpone X seconds
-        #     for token in self.simulation_process.tokens_pending:
-        #         wait = self.simulation_process.tokens_pending[token][0].update_time_after_postpone(5)
-        #         self.env.process(wait)
-        #     self.handle_postpone_exception()
+        #elif self.check_exception_postpone(): ### exception case: all available resources and all tokens already arrived
+        #    for token in self.simulation_process.tokens_pending:
+        #        wait = self.simulation_process.tokens_pending[token][0].update_time_after_postpone(5)
+        #        self.env.process(wait)
+        #    self.handle_postpone_exception()
         else:
             self.next_decision_moment(self.output[action])
 
