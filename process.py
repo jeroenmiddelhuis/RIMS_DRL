@@ -78,7 +78,7 @@ class SimulationProcess(object):
         """
         occup = 0
         for res in self._resources:
-            if res != 'TRIGGER_TIMER' and  self._params.RESOURCE_TO_ROLE_LSTM[res] == role:
+            if res != 'TRIGGER_TIMER' and self._params.RESOURCE_TO_ROLE_LSTM[res] == role:
                 occup += self._resources[res]._get_resource().count
         occup = occup / self._params.ROLE_CAPACITY_LSTM[role][0]
         return round(occup, 2)
