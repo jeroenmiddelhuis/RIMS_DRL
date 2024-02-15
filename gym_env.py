@@ -28,11 +28,11 @@ if __name__ == "__main__":
 
 
 class gym_env(Env):
-    def __init__(self, name_log, POLICY=None, print=False, i=None) -> None:
+    def __init__(self, NAME_LOG, N_TRACES, CALENDAR, POLICY=None, i=None) -> None:
 
-        self.name_log = name_log
+        self.name_log = NAME_LOG
         self.policy = POLICY
-        self.print = print
+        self.print = False
         input_file = './example/' + self.name_log + '/input_' + self.name_log + '.json'
         with open(input_file, 'r') as f:
             input_data = json.load(f)
@@ -61,11 +61,10 @@ class gym_env(Env):
         self.PATH_PETRINET = './example/' + self.name_log + '/' + self.name_log + '.pnml'
         PATH_PARAMETERS = input_file
         #self.N_TRACES = input_data['traces']
-        self.N_TRACES = 2000
-        self.CALENDAR = True ## "True" If you want to use calendar, "False" otherwise
+        self.N_TRACES = N_TRACES
+        self.CALENDAR = CALENDAR ## "True" If you want to use calendar, "False" otherwise
         self.PATH_LOG = './example/' + self.name_log + '/' + self.name_log + '.xes'
         self.params = Parameters(PATH_PARAMETERS, self.N_TRACES, self.name_log, self.FEATURE_ROLE)
-
         ### define possible assignments from log
         self.output = self.retrieve_possible_assignments(self.params.RESOURCE_TO_ROLE_LSTM)
 
@@ -149,10 +148,10 @@ class gym_env(Env):
         if self.output[action] == 'Postpone':
             self.nr_postpone += 1
         self.nr_steps += 1
-        if self.nr_steps % 1000 == 0:
+        if self.nr_steps % 5000 == 0:
             print('Steps:', self.nr_steps)
             print('State', self.get_state())
-            print('Postpone actions:', self.nr_postpone, '/1000')
+            print('Postpone actions:', self.nr_postpone, '/5000')
             self.nr_postpone = 0
 
         #trace_ongoing_prev = dict(self.simulation_process.get_state()['traces']['ongoing'])
@@ -194,12 +193,12 @@ class gym_env(Env):
         for trace_id, cycle_time in self.simulation_process.traces['ended']:
             if trace_id not in self.completed_traces:
                 self.completed_traces.append(trace_id)
-                reward += 1 / (1 + (cycle_time/3600))
+                reward += 1 / (1 + (cycle_time/1000))
 
         if len(self.tokens) == 0:
             isTerminated = True
             print('Mean cycle time:', np.mean([cycle_time/3600 for (trace_id, cycle_time) in self.simulation_process.traces['ended']]))
-            print('Total reward:', sum([1 / (1 + (cycle_time/3600)) for (trace_id, cycle_time) in self.simulation_process.traces['ended']]))  
+            print('Total reward:', sum([1 / (1 + (cycle_time/10000)) for (trace_id, cycle_time) in self.simulation_process.traces['ended']]))  
             print([(cycle_time/3600) for (trace_id, cycle_time) in self.simulation_process.traces['ended']])    
         else:
             isTerminated = False
@@ -216,7 +215,7 @@ class gym_env(Env):
         for trace_id, cycle_time in self.simulation_process.traces['ended']:
             if trace_id not in self.completed_traces:
                 self.completed_traces.append(trace_id)
-                reward += 1 / (1 + (cycle_time / 3600))
+                reward += 1 / (1 + (cycle_time / 10000))
 
         if len(self.tokens) == 0:
             isTerminated = True

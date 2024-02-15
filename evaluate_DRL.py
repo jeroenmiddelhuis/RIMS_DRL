@@ -126,7 +126,7 @@ def evaluate(NAME, POLICY):
 
 
 def run_simulation(NAME_LOG, POLICY, N_SIMULATION, model=None, median_processing_time=None):
-    env_simulator = gym_env(NAME_LOG, POLICY, True)
+    env_simulator = gym_env(NAME_LOG, POLICY, N_TRACES, CALENDAR, True)
     for i in range(0, N_SIMULATION):
         obs = env_simulator.reset(i=i)
         isTerminated = False
@@ -154,6 +154,8 @@ def run_simulation(NAME_LOG, POLICY, N_SIMULATION, model=None, median_processing
 model = None
 
 NAME_LOG = 'BPI_Challenge_2017_W_Two_TS'
+N_TRACES = 1000
+CALENDAR = False
 POLICY = 'RANDOM'
 N_SIMULATION = 25
 ## i number of simulations for log

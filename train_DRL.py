@@ -30,31 +30,37 @@ class CustomPolicy(MaskableActorCriticPolicy):
         super(CustomPolicy, self).__init__(*args, **kwargs,
                                            net_arch=[dict(pi=[128, 128],
                                                           vf=[128, 128])])
-
-NAME_LOG = 'BPI_Challenge_2017_W_Two_TS'
+if len(sys.argv) > 0:
+    NAME_LOG = sys.argv[1]#'BPI_Challenge_2017_W_Two_TS'
+    N_TRACES = int(sys.argv[2])#2000
+    if sys.argv[3] == "True":
+        CALENDAR = True
+    elif sys.argv[3] == "False":
+        CALENDAR = False
+else:
+    NAME_LOG = 'BPI_Challenge_2017_W_Two_TS'
+    N_TRACES = 1000
+    CALENDAR = True
 
 #### to use BPI_Challenge_2017_W_Two_TS first download the entire log from 'https://drive.google.com/file/d/1juGeinUqaxkLBEmObIBYiRA3NqAMOcoN/view?usp=drive_link' and place it in the folder of the same name inside example
 
 if __name__ == '__main__':
     #if true, load model for a new round of training
-    
-    running_time = 5000
-    N_TRACES = 100
     num_cpu = 1
     load_model = False
     postpone_penalty = 0
     time_steps = 1280000
-    n_steps = 2560# Number of steps for each network update
+    n_steps = 25600# Number of steps for each network update
     # Create log dir
     now = datetime.datetime.now()
-    log_dir = f"./tmp/{NAME_LOG}_{now.year}_{now.month}_{now.day}_{now.hour}_{now.minute}/"  # Logging training results
-
+    #log_dir = f"./tmp/{NAME_LOG}_{now.year}_{now.month}_{now.day}_{now.hour}_{now.minute}/"  # Logging training results
+    log_dir = f"./tmp/{NAME_LOG}_{N_TRACES}_{CALENDAR}_{now.minute}/"
     os.makedirs(log_dir, exist_ok=True)
 
     #print(f'Training agent for {config_type} with {time_steps} timesteps in updates of {n_steps} steps.')
     # Create and wrap the environment
     # Reward functions: 'AUC', 'case_task'
-    env_simulator = gym_env(NAME_LOG, N_TRACES, print=False)  # Initialize env
+    env_simulator = gym_env(NAME_LOG, N_TRACES, CALENDAR)  # Initialize env
 
     env = Monitor(env_simulator, log_dir)
 
@@ -77,7 +83,7 @@ if __name__ == '__main__':
 
     model.learn(total_timesteps=int(time_steps), callback=checkpoint_callback)
 
-    model.save(f'{log_dir}/_{running_time}_final')
+    model.save(f'{log_dir}/model_final')
 
     # Train the agent
     #callback = SaveOnBestTrainingRewardCallback(check_freq=int(n_steps), log_dir=log_dir)
