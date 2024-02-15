@@ -31,7 +31,7 @@ class CustomPolicy(MaskableActorCriticPolicy):
                                            net_arch=[dict(pi=[128, 128],
                                                           vf=[128, 128])])
 
-NAME_LOG = 'BPI_Challenge_2017_W_Two_TS'
+NAME_LOG = 'confidential_1000'
 
 #### to use BPI_Challenge_2017_W_Two_TS first download the entire log from 'https://drive.google.com/file/d/1juGeinUqaxkLBEmObIBYiRA3NqAMOcoN/view?usp=drive_link' and place it in the folder of the same name inside example
 

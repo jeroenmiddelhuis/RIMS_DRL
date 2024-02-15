@@ -60,9 +60,9 @@ class gym_env(Env):
             self.FEATURE_ROLE = None
         self.PATH_PETRINET = './example/' + self.name_log + '/' + self.name_log + '.pnml'
         PATH_PARAMETERS = input_file
-        #self.N_TRACES = input_data['traces']
-        self.N_TRACES = 2000
-        self.CALENDAR = True ## "True" If you want to use calendar, "False" otherwise
+        self.N_TRACES = input_data['traces']
+        self.N_TRACES = 20
+        self.CALENDAR = False ## "True" If you want to use calendar, "False" otherwise
         self.PATH_LOG = './example/' + self.name_log + '/' + self.name_log + '.xes'
         self.params = Parameters(PATH_PARAMETERS, self.N_TRACES, self.name_log, self.FEATURE_ROLE)
 
@@ -288,17 +288,23 @@ class gym_env(Env):
     def get_state(self):
         env_state = self.simulation_process.get_state()
         #if DEBUG_PRINT: print(self.env.now, self.simulation_process.get_state())
+        # for each resource: 1=free, 0=occupied
         resource_available = [1.0 if resource in env_state['resource_available'] else 0 for resource in self.resources]
+        # for each resource it assigns a rational number bewteen 0 and 1 with step 1/#task_types
+        # every number corresponds to the task type to which the resource is assigned
+        # it is like a non convetional nominal encoding done with a single real number
         resource_assigned_to = [0.0 for _ in range(len(self.resources))]
         for (trace_id, task_type, res) in env_state['actual_assignment']:
             resource_assigned_to[self.resources.index(res)] = (self.task_types.index(task_type) + 1) / len(self.task_types)
-        
+        # for each activity: it counts how many tokens_pending are waiting the resource with that activity
+        # It counts until 10 and normalize by 10
         if len(self.simulation_process.tokens_pending) > 0:
             task_types_num = [min(1.0, sum([1 if self.simulation_process.tokens_pending[token][0]._next_activity == task_type else 0 for token in self.simulation_process.tokens_pending])/10) for task_type in self.task_types]
         else:
             task_types_num = [0.0 for _ in range(len(self.task_types))]
         #wip = [(len(env_state['traces']['ongoing'])+1)/1000]
-        #time = [(env_state['time'].weekday() + 1)/7, (env_state['time'].hour + 1)/24]
+
+        time = [(env_state['time'].weekday() + 1)/7, (env_state['time'].hour + 1)/24]
         return np.array(resource_available + resource_assigned_to + task_types_num)
 
     # Create an action mask which invalidates ineligible actions

@@ -101,6 +101,7 @@ class SimulationProcess(object):
 
         state['actual_assignment'] = self._actual_assignment
         state['traces'] = self.traces
+        state['time'] = self._date_start + timedelta(seconds=self._env.now)
         return state
 
     def _get_resource(self, res):
