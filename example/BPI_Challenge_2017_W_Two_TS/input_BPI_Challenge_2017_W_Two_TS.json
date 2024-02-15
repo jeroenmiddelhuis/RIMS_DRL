@@ -1,6 +1,6 @@
 {
     "start_timestamp": "2021-06-03 18:27:58",
-    "traces": 1200,
+    "traces": 5789,
     "interTriggerTimer": {
         "type": "custom"
     },

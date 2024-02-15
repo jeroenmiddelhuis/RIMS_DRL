@@ -39,7 +39,7 @@ if len(sys.argv) > 0:
         CALENDAR = False
 else:
     NAME_LOG = 'BPI_Challenge_2017_W_Two_TS'
-    N_TRACES = 1000
+    N_TRACES = 'from_input_data'
     CALENDAR = True
 
 #### to use BPI_Challenge_2017_W_Two_TS first download the entire log from 'https://drive.google.com/file/d/1juGeinUqaxkLBEmObIBYiRA3NqAMOcoN/view?usp=drive_link' and place it in the folder of the same name inside example
