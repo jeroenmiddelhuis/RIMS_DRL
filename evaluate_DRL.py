@@ -1,7 +1,4 @@
-import gymnasium as gym
 
-from stable_baselines3 import PPO
-from stable_baselines3.common.env_util import make_vec_env
 from gym_env import gym_env
 from sb3_contrib import MaskablePPO
 import random
@@ -11,12 +8,15 @@ import pm4py
 from pm4py.objects.log.util import sorting
 import numpy as np
 import scipy.stats as st
-from pm4py.objects.log.obj import EventLog, Trace
+import json
+from collections import defaultdict
+
 
 
 def FIFO(state, tokens_pending, possible_action):
     if len(tokens_pending) > 0 and len(state['resource_available']) > 0:
         possible_ass = []
+        ### Finding all possible assignments (resources available and tokens pending)
         for token in tokens_pending:
             act = tokens_pending[token][0]._next_activity
             for res in state['resource_available']:
@@ -25,6 +25,7 @@ def FIFO(state, tokens_pending, possible_action):
         if len(possible_ass) == 0:
             return None
         else:
+            #In order of cycle time find the first possible allocation
             list_tokens_pending = list(tokens_pending.keys())
             i = 0
             next_ass = None
@@ -40,18 +41,51 @@ def FIFO(state, tokens_pending, possible_action):
     else:
         return None
 
-def RANDOM(state, tokens, possible_action):
-    next_ass = None
-    if len(tokens) > 0 and len(state['resource_available']) > 0:
+
+def FIFO_case(state, tokens_pending, possible_action):
+    if len(tokens_pending) > 0 and len(state['resource_available']) > 0:
         possible_ass = []
-        for token in tokens:
-            act = tokens[token][0]._next_activity
+        ### Finding all possible assignments (resources available and tokens pending)
+        for token in tokens_pending:
+            act = tokens_pending[token][0]._next_activity
+            for res in state['resource_available']:
+                if (res, act) in possible_action:
+                    possible_ass.append((token, act, res))
+        if len(possible_ass) == 0:
+            return None
+        else:
+            #In order of arrival time find the first possible allocation
+            list_tokens_pending = list(tokens_pending.keys())
+            #print('LIST TOKENS PENDING', list_tokens_pending)
+            next_ass = None
+            while len(list_tokens_pending) > 0:
+                first_case = min(list_tokens_pending)
+                #print('FIST CASE', first_case)
+                possible_ass_token = [a for a in possible_ass if a[0] == first_case]
+                #print('POSSIBLE ASSIGN', possible_ass_token)
+                if len(possible_ass_token) > 0:
+                    next_ass = random.choice(possible_ass_token)
+                    list_tokens_pending = []
+                else:
+                    list_tokens_pending.remove(first_case)
+            return next_ass
+    else:
+        return None
+
+
+def RANDOM(state, tokens_pending, possible_action):
+    next_ass = None
+    if len(tokens_pending) > 0 and len(state['resource_available']) > 0:
+        possible_ass = []
+        for token in tokens_pending:
+            act = tokens_pending[token][0]._next_activity
             for res in state['resource_available']:
                 if (res, act) in possible_action:
                     possible_ass.append((token, act, res))
         if len(possible_ass) > 0:
             next_ass = random.choice(possible_ass)
     return next_ass
+
 
 def SPT(state, tokens_pendings, median_processing_time, possible_action):
     if len(tokens_pendings) > 0 and len(state['resource_available']) > 0:
@@ -88,8 +122,8 @@ def retrieve_median_processing_time(NAME_LOG):
 
     for a in median_processing_time:
         for res in median_processing_time[a]:
-            median_processing_time[a][res] = np.median(median_processing_time[a][res])
-            #median_processing_time[a][res] = np.mean(median_processing_time[a][res])
+            #median_processing_time[a][res] = np.median(median_processing_time[a][res])
+            median_processing_time[a][res] = np.mean(median_processing_time[a][res])
     return median_processing_time
 
 
@@ -106,10 +140,10 @@ def confidence_interval(data):
     ci_upper = x_bar + t_star * s / np.sqrt(n)
     ci_lower = x_bar - t_star * s / np.sqrt(n)
 
-    print('CI ', ci_lower, ci_upper)
+    return ci_lower, ci_upper
 
 
-def evaluate(NAME, POLICY):
+def evaluate(NAME, POLICY, data):
     path = 'output/output_' + NAME + '/simulated_log_' + NAME + '_' + POLICY + '*.csv'
     all_file = glob.glob(path)
     cycle_time = []
@@ -121,9 +155,9 @@ def evaluate(NAME, POLICY):
         simulated_log = sorting.sort_timestamp_log(simulated_log)
         for trace in simulated_log:
             cycle_time.append((trace[-1]['end_time'] - trace[0]['start_time']).total_seconds())
-    print('MEAN CYCLE', np.mean(cycle_time))
-    confidence_interval(cycle_time)
-
+    ci_lower, ci_upper = confidence_interval(cycle_time)
+    data[POLICY] = {'values': cycle_time, 'mean': [np.mean(cycle_time), ci_lower, ci_upper],
+                    'percentile_25_50_75': list(np.percentile(cycle_time, [25, 50, 75]))}
 
 def run_simulation(NAME_LOG, POLICY, N_SIMULATION, model=None, median_processing_time=None):
     env_simulator = gym_env(NAME_LOG, POLICY, N_TRACES, CALENDAR, True)
@@ -133,8 +167,11 @@ def run_simulation(NAME_LOG, POLICY, N_SIMULATION, model=None, median_processing
         ##### simulation #####
         while not isTerminated:
             state = env_simulator.get_state()
-            if POLICY == 'FIFO':
+            if POLICY == 'FIFO_activity':
                 action = FIFO(env_simulator.simulation_process.get_state(), env_simulator.simulation_process.tokens_pending, env_simulator.output)
+                state, reward, isTerminated, dones, info = env_simulator.step_baseline(action)
+            elif POLICY == 'FIFO_case':
+                action = FIFO_case(env_simulator.simulation_process.get_state(), env_simulator.simulation_process.tokens_pending, env_simulator.output)
                 state, reward, isTerminated, dones, info = env_simulator.step_baseline(action)
             elif POLICY == 'SPT':
                 action = SPT(env_simulator.simulation_process.get_state(), env_simulator.simulation_process.tokens_pending, median_processing_time, env_simulator.output)
@@ -150,23 +187,32 @@ def run_simulation(NAME_LOG, POLICY, N_SIMULATION, model=None, median_processing
 
 
 ### Path DRL model
-#model = MaskablePPO.load("/tmp/20000000_25600_2023-11-21 13:00:43.547943/rl_model_1300000_steps.zip/")
+#model = MaskablePPO.load("/Users/francescameneghello/Downloads/models_RL_integration/confidential_1000_159_True_6/model_final.zip/")
 model = None
 
+<<<<<<< Updated upstream
 NAME_LOG = 'BPI_Challenge_2017_W_Two_TS'
 N_TRACES = 1000
 CALENDAR = False
 POLICY = 'RANDOM'
 N_SIMULATION = 25
+=======
+NAME_LOG = 'BPI_Challenge_2012_W_Two_TS'
+#POLICY = 'FIFO'
+N_SIMULATION = 2
+
+data = {'FIFO_activity': {}, 'FIFO_case': {}, 'RANDOM': {}, 'SPT': {}}
+>>>>>>> Stashed changes
 ## i number of simulations for log
-if POLICY == 'SPT':
-    median_processing_time = retrieve_median_processing_time(NAME_LOG)
-    run_simulation(NAME_LOG, POLICY, N_SIMULATION, median_processing_time=median_processing_time)
-elif POLICY == 'FIFO' or POLICY == 'RANDOM':
-    run_simulation(NAME_LOG, POLICY, N_SIMULATION)
-else:
-    run_simulation(NAME_LOG, POLICY, N_SIMULATION, model=model)
+for POLICY in ['FIFO_case', 'RANDOM', 'SPT']:
+    if POLICY == 'SPT':
+        median_processing_time = retrieve_median_processing_time(NAME_LOG)
+        run_simulation(NAME_LOG, POLICY, N_SIMULATION, median_processing_time=median_processing_time)
+    elif POLICY == 'FIFO_activity' or POLICY == 'FIFO_case' or POLICY == 'RANDOM':
+        run_simulation(NAME_LOG, POLICY, N_SIMULATION)
+    else:
+        run_simulation(NAME_LOG, POLICY, N_SIMULATION, model=model)
+    evaluate(NAME_LOG, POLICY, data)
 
-evaluate(NAME_LOG, POLICY)
-
-
+with open('output/output_' + NAME_LOG + '/results.json', 'w') as f:
+    json.dump(data, f)

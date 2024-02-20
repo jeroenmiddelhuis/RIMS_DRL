@@ -54,6 +54,13 @@ class Token(object):
 
     def inter_trigger_time(self, time):
         yield self.env.timeout(time)
+        ### set arrival time ####
+        self._buffer.set_feature("id_case", self._id)
+        self._buffer.set_feature("activity", "start")
+        self._buffer.set_feature("start_time", self._start_time + timedelta(seconds=self.env.now))
+        self._buffer.set_feature("end_time", self._start_time + timedelta(seconds=self.env.now))
+        if self.print:
+            self._buffer.print_values()
         time = self._start_time + timedelta(seconds=self.env.now)
         self._time_last_activity = self.env.now
         self._process.update_tokens_pending(self)
