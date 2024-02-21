@@ -30,7 +30,6 @@ class CustomPolicy(MaskableActorCriticPolicy):
         super(CustomPolicy, self).__init__(*args, **kwargs,
                                            net_arch=[dict(pi=[128, 128],
                                                           vf=[128, 128])])
-
 if len(sys.argv) > 1:
     NAME_LOG = sys.argv[1]#'BPI_Challenge_2017_W_Two_TS'
     N_TRACES = int(sys.argv[2])#2000
@@ -39,8 +38,8 @@ if len(sys.argv) > 1:
     elif sys.argv[3] == "False":
         CALENDAR = False
 else:
-    NAME_LOG = 'BPI_Challenge_2017_W_Two_TS'
-    N_TRACES = 'from_input_data'
+    NAME_LOG = 'Productions'
+    N_TRACES = 2000
     CALENDAR = True
 
 #### to use BPI_Challenge_2017_W_Two_TS first download the entire log from 'https://drive.google.com/file/d/1juGeinUqaxkLBEmObIBYiRA3NqAMOcoN/view?usp=drive_link' and place it in the folder of the same name inside example
