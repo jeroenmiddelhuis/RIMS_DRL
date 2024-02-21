@@ -28,7 +28,7 @@ if __name__ == "__main__":
 
 
 class gym_env(Env):
-    def __init__(self, NAME_LOG, N_TRACES, CALENDAR, normalization=True, POLICY=None, i=None) -> None:
+    def __init__(self, NAME_LOG, N_TRACES, CALENDAR, normalization=True, POLICY=None, N_SIMULATION=0) -> None:
         self.name_log = NAME_LOG
         self.normalization_cycle_times = {"BPI_Challenge_2012_W_Two_TS":5102,
                                           "confidential_1000":30042,
@@ -41,7 +41,7 @@ class gym_env(Env):
         input_file = './example/' + self.name_log + '/input_' + self.name_log + '.json'
         with open(input_file, 'r') as f:
             input_data = json.load(f)
-        self.n_simulation = i
+        self.n_simulation = N_SIMULATION
 
         self.resources = sorted(list(input_data["resource"].keys()))
         self.task_types = sorted(list(input_data["processing_time"].keys()))
@@ -107,16 +107,11 @@ class gym_env(Env):
         return list(possible_assignment) + ['Postpone']
 
     def reset(self, seed=0, i=None):
-        #self.nr_steps = 0
-        
         print('-------- Resetting environment --------')
-        # TODO:
-        # Please have a look if this is a good way to reset the environment.
-        # The simulation should restart and run until the first decision moment.
         self.env = simpy.Environment()
         self.simulation_process = SimulationProcess(self.env, self.params, self.CALENDAR)
         self.completed_traces = []
-        if self.print:
+        if i != None:
             utility.define_folder_output("output/output_{}".format(self.name_log))
             f = open("output/output_{}/simulated_log_{}_{}_{}".format(self.name_log, self.name_log, self.policy, str(i)) + ".csv", 'w')
             print("output/output_{}/simulated_log_{}_{}_{}".format(self.name_log, self.name_log, self.policy, str(i)) + ".csv")
@@ -135,7 +130,7 @@ class gym_env(Env):
             parallel_object = utility.ParallelObject()
             time_trace = self.env.now
             token = Token(i, net, im, self.params, self.simulation_process, prefix, 'sequential', writer, parallel_object,
-                          itime, self.env, self.CALENDAR, None, self.print)
+                          itime, self.env, self.CALENDAR, None, print=False)
             self.tokens[i] = token
             self.env.process(token.inter_trigger_time(itime))
             
@@ -337,6 +332,6 @@ class gym_env(Env):
         if len(self.simulation_process.tokens_pending) == (self.N_TRACES-len(state_simulator['traces']['ended'])) and all([state[self.input.index(resource + '_availability')] > 0 for resource in self.resources]):
             mask[-1] = 0 # All tokens have arrived and all resources available. State will not change so we mask postpone
         else:
-            mask[-1] = 0 # Postpone available
+            mask[-1] = 1 # Postpone available
         return list(map(bool, mask))
 

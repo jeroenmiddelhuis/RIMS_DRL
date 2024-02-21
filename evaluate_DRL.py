@@ -160,7 +160,7 @@ def evaluate(NAME, POLICY, data):
                     'percentile_25_50_75': list(np.percentile(cycle_time, [25, 50, 75]))}
 
 def run_simulation(NAME_LOG, POLICY, N_SIMULATION, model=None, median_processing_time=None):
-    env_simulator = gym_env(NAME_LOG, POLICY, N_TRACES, CALENDAR, True)
+    env_simulator = gym_env(NAME_LOG, N_TRACES, CALENDAR, normalization=True)
     for i in range(0, N_SIMULATION):
         obs = env_simulator.reset(i=i)
         isTerminated = False
@@ -189,20 +189,13 @@ def run_simulation(NAME_LOG, POLICY, N_SIMULATION, model=None, median_processing
 ### Path DRL model
 #model = MaskablePPO.load("/Users/francescameneghello/Downloads/models_RL_integration/confidential_1000_159_True_6/model_final.zip/")
 model = None
-
-<<<<<<< Updated upstream
 NAME_LOG = 'BPI_Challenge_2017_W_Two_TS'
 N_TRACES = 1000
 CALENDAR = False
 POLICY = 'RANDOM'
 N_SIMULATION = 25
-=======
-NAME_LOG = 'BPI_Challenge_2012_W_Two_TS'
-#POLICY = 'FIFO'
-N_SIMULATION = 2
 
 data = {'FIFO_activity': {}, 'FIFO_case': {}, 'RANDOM': {}, 'SPT': {}}
->>>>>>> Stashed changes
 ## i number of simulations for log
 for POLICY in ['FIFO_case', 'RANDOM', 'SPT']:
     if POLICY == 'SPT':

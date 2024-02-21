@@ -33,15 +33,20 @@ class CustomPolicy(MaskableActorCriticPolicy):
 
 if len(sys.argv) > 1:
     NAME_LOG = sys.argv[1]#'BPI_Challenge_2017_W_Two_TS'
-    N_TRACES = int(sys.argv[2])#2000
-    if sys.argv[3] == "True":
-        CALENDAR = True
-    elif sys.argv[3] == "False":
-        CALENDAR = False
+    if not sys.argv[2] == 'from_input_data':    
+        N_TRACES = int(sys.argv[2])#2000
+    else:
+        N_TRACES = sys.argv[2]
+    CALENDAR = True if sys.argv[3] == "True" else False
+    if len(sys.argv) > 4:
+        normalization = True if sys.argv[4] == "True" else False
+    else:
+        normalization = True
 else:
     NAME_LOG = 'BPI_Challenge_2017_W_Two_TS'
     N_TRACES = 'from_input_data'
     CALENDAR = True
+    normalization = True
 
 #### to use BPI_Challenge_2017_W_Two_TS first download the entire log from 'https://drive.google.com/file/d/1juGeinUqaxkLBEmObIBYiRA3NqAMOcoN/view?usp=drive_link' and place it in the folder of the same name inside example
 
@@ -55,13 +60,13 @@ if __name__ == '__main__':
     # Create log dir
     now = datetime.datetime.now()
     #log_dir = f"./tmp/{NAME_LOG}_{now.year}_{now.month}_{now.day}_{now.hour}_{now.minute}/"  # Logging training results
-    log_dir = f"./tmp/{NAME_LOG}_{N_TRACES}_{CALENDAR}_{now.minute}/"
+    log_dir = f"./tmp/{NAME_LOG}_{N_TRACES}_{CALENDAR}/"
     os.makedirs(log_dir, exist_ok=True)
 
     #print(f'Training agent for {config_type} with {time_steps} timesteps in updates of {n_steps} steps.')
     # Create and wrap the environment
     # Reward functions: 'AUC', 'case_task'
-    env_simulator = gym_env(NAME_LOG, N_TRACES, CALENDAR, normalization=True)  # Initialize env
+    env_simulator = gym_env(NAME_LOG, N_TRACES, CALENDAR, normalization=normalization)  # Initialize env
 
     env = Monitor(env_simulator, log_dir)
 
