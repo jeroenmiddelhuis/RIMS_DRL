@@ -34,7 +34,8 @@ class gym_env(Env):
                                           "confidential_1000":30042,
                                           "ConsultaDataMining201618":188645,
                                           "PurchasingExample":434950,
-                                          "BPI_Challenge_2017_W_Two_TS":1077125}
+                                          "BPI_Challenge_2017_W_Two_TS":1077125,
+                                          "Productions":265928}
         self.normalization_cycle_time = self.normalization_cycle_times[self.name_log] if normalization else 0
         #self.median_processing_time = retrieve_median_processing_time(NAME_LOG)
         self.policy = POLICY
@@ -165,7 +166,6 @@ class gym_env(Env):
                 # token_id = random.choice([token for token in tokens_pending.keys()])
                 # print(token_id)
                 token_id = max(tokens_pending.items(), key=lambda x: x[1][1])[0]
-                print(token_id, tokens_pending.items())
             else:
                 token_id = list(tokens_pending.keys())[0]
             simulation = self.tokens[token_id].simulation({'task': self.output[action][1],

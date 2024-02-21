@@ -43,7 +43,7 @@ if len(sys.argv) > 1:
         normalization = True
 else:
     NAME_LOG = 'Productions'
-    N_TRACES = 2000
+    N_TRACES = 'from_input_data'
     CALENDAR = True
     normalization = True
 
@@ -54,8 +54,10 @@ if __name__ == '__main__':
     num_cpu = 1
     load_model = False
     postpone_penalty = 0
-    time_steps = 2560000
-    n_steps = 12800# Number of steps for each network update
+    time_steps = 1280000
+    n_steps = 6400# Number of steps for each network update
+    if NAME_LOG == 'BPI_Challenge_2017_W_Two_TS':
+        n_steps = 38400
     # Create log dir
     now = datetime.datetime.now()
     #log_dir = f"./tmp/{NAME_LOG}_{now.year}_{now.month}_{now.day}_{now.hour}_{now.minute}/"  # Logging training results
