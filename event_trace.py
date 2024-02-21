@@ -97,6 +97,7 @@ class Token(object):
         ### define resource for activity
         resource = self._process._get_resource(action['resource'])
         self._buffer.set_feature("ro_single", self._process.get_occupations_single_role(resource._get_name()))
+
         self._buffer.set_feature("ro_total", self._process.get_occupations_all_role(self._params.RESOURCE_TO_ROLE_LSTM[action['resource']]))
         self._buffer.set_feature("role", resource._get_name())
 
