@@ -31,7 +31,10 @@
         "ID4219":{"resources":["ID4219"],"calendar":{"days":[1, 0, 3, 7],"hour_min":14,"hour_max":23}},
         "ID4794":{"resources":["ID4794"],"calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}},
         "ID4820":{"resources":["ID4820"],"calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}},
-        "ID4529":{"resources":["ID4529"],"calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}
+        "ID4529":{"resources":["ID4529"],"calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}},
+        "ID4890":{"resources":["ID4890"],"calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}},
+        "ID3641":{"resources":["ID3641"],"calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}},
+        "ID4442":{"resources":["ID4442"],"calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}}
     },
     "processing_time":{
         "Change Version":  {
