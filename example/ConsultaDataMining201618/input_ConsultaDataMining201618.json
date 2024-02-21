@@ -1,6 +1,7 @@
 {
     "start_timestamp": "2012-02-13 20:42:08",
     "traces": 181,
+    "traces_entire_log": 954,
     "interTriggerTimer": {
         "type": "custom"
     },
