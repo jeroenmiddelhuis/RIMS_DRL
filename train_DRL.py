@@ -30,7 +30,6 @@ class CustomPolicy(MaskableActorCriticPolicy):
         super(CustomPolicy, self).__init__(*args, **kwargs,
                                            net_arch=[dict(pi=[128, 128],
                                                           vf=[128, 128])])
-
 if len(sys.argv) > 1:
     NAME_LOG = sys.argv[1]#'BPI_Challenge_2017_W_Two_TS'
     if not sys.argv[2] == 'from_input_data':    
@@ -43,8 +42,8 @@ if len(sys.argv) > 1:
     else:
         normalization = True
 else:
-    NAME_LOG = 'BPI_Challenge_2017_W_Two_TS'
-    N_TRACES = 'from_input_data'
+    NAME_LOG = 'Productions'
+    N_TRACES = 2000
     CALENDAR = True
     normalization = True
 
