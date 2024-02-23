@@ -9,7 +9,7 @@ from datetime import datetime
 
 class Parameters(object):
 
-    def __init__(self, path_parameters: str, traces: int, name_log: str, feature_role: str):
+    def __init__(self, path_parameters: str, traces: int, name_log: str, feature_role: str, threshold=0):
         self.TRACES = traces
         """TRACES: number of traces to generate"""
         self.PATH_PARAMETERS = path_parameters
@@ -19,6 +19,7 @@ class Parameters(object):
             self.prefix = ('_diapr', '_dpiapr', '_dwiapr')
         else:
             self.prefix = ('_dispr', '_dpispr', '_dwispr')
+        self.threshold = threshold
         self.NAME_EXP = name_log
         self.read_metadata_file()
         self.parameters_LSTM_model()
@@ -65,11 +66,13 @@ class Parameters(object):
     def parameters_LSTM_model(self):
         self.MODEL_PATH_PROCESSING = './example/' + self.NAME_EXP + '/' + self.NAME_EXP + self.prefix[1] + '.h5'
         self.MODEL_PATH_WAITING = './example/' + self.NAME_EXP + '/' + self.NAME_EXP + self.prefix[2] + '.h5'
-        self.METADATA = './example/' + self.NAME_EXP + '/' + self.NAME_EXP + self.prefix[0] + '_meta.json'
+        if self.threshold > 0:
+            self.METADATA = './example/' + self.NAME_EXP + '/' + self.NAME_EXP + self.prefix[0] + '_meta' + str(self.threshold) + '.json'
+        else:
+            self.METADATA = './example/' + self.NAME_EXP + '/' + self.NAME_EXP + self.prefix[0] + '_meta.json'
         self.SCALER = './example/' + self.NAME_EXP + '/' + self.NAME_EXP + self.prefix[0] + '_scaler.pkl'
         self.INTER_SCALER = './example/' + self.NAME_EXP + '/' + self.NAME_EXP + self.prefix[0] + '_inter_scaler.pkl'
-        self.END_INTER_SCALER = './example/' + self.NAME_EXP + '/' + self.NAME_EXP + self.prefix[
-            0] + '_end_inter_scaler.pkl'
+        self.END_INTER_SCALER = './example/' + self.NAME_EXP + '/' + self.NAME_EXP + self.prefix[0] + '_end_inter_scaler.pkl'
         self.MODEL_PROPHET = './example/' + self.NAME_EXP + '/' + self.NAME_EXP + '_prf.json'
         self.METADATA_PROPHET = './example/' + self.NAME_EXP + '/' + self.NAME_EXP + '_prf_meta.json'
 

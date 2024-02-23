@@ -1,0 +1,75 @@
+{
+    "start_timestamp": "2021-06-03 18:27:58",
+    "traces": 5789,
+    "interTriggerTimer": {
+        "type": "custom"
+    },
+    "resource": {
+        "User_14":{"resources":["User_14"],"calendar":{"days":[3, 4, 0, 2, 1],"hour_min":10,"hour_max":19}},
+        "User_2":{"resources":["User_2"],"calendar":{"days":[1, 3, 0, 4, 2, 5],"hour_min":10,"hour_max":19}},
+        "User_87":{"resources":["User_87"],"calendar":{"days":[2, 4, 3, 1, 0],"hour_min":7,"hour_max":15}},
+        "User_3":{"resources":["User_3"],"calendar":{"days":[4, 1, 2, 0, 5, 3],"hour_min":10,"hour_max":19}},
+        "User_144":{"resources":["User_144"],"calendar":{"days":[0, 1, 3, 5, 2, 4],"hour_min":9,"hour_max":18}},
+        "User_49":{"resources":["User_49"],"calendar":{"days":[1, 0, 3, 4, 2, 6],"hour_min":7,"hour_max":19}},
+        "User_138":{"resources":["User_138"],"calendar":{"days":[0, 3, 4, 1, 2],"hour_min":10,"hour_max":19}},
+        "User_43":{"resources":["User_43"],"calendar":{"days":[3, 1, 5, 2, 4, 0],"hour_min":7,"hour_max":19}},
+        "User_143":{"resources":["User_143"],"calendar":{"days":[3, 4, 2, 1, 0],"hour_min":6,"hour_max":19}},
+        "User_11":{"resources":["User_11"],"calendar":{"days":[3, 4, 0, 1, 2],"hour_min":6,"hour_max":19}},
+        "User_18":{"resources":["User_18"],"calendar":{"days":[4, 1, 3, 0, 2],"hour_min":10,"hour_max":19}}
+    },
+    "probability": {
+    },
+  "processing_time": {
+        "W_Shortened completion":  {
+            "name": "custom"
+        },
+        "W_Assess potential fraud":  {
+            "name": "custom"
+        },
+        "W_Handle leads":  {
+            "name": "custom"
+        },
+        "W_Complete application":  {
+            "name": "custom"
+        },
+        "W_Call incomplete files":  {
+            "name": "custom"
+        },
+        "W_Call after offers":  {
+            "name": "custom"
+        },
+        "W_Validate application":  {
+            "name": "custom"
+        }
+    },
+    "resource_table": [
+       {
+            "role": "Role 1",
+            "task": "W_Shortened completion"
+        },
+        {
+            "role": "Role 2",
+            "task": "W_Assess potential fraud"
+        },
+        {
+            "role": "Role 1",
+            "task": "W_Handle leads"
+        },
+        {
+            "role": "Role 1",
+            "task": "W_Complete application"
+        },
+        {
+            "role": "Role 1",
+            "task": "W_Call incomplete files"
+        },
+        {
+            "role": "Role 1",
+            "task": "W_Call after offers"
+        },
+        {
+            "role": "Role 1",
+            "task": "W_Validate application"
+        }
+    ]
+}

@@ -28,7 +28,7 @@ if __name__ == "__main__":
 
 
 class gym_env(Env):
-    def __init__(self, NAME_LOG, N_TRACES, CALENDAR, normalization=True, POLICY=None, N_SIMULATION=0) -> None:
+    def __init__(self, NAME_LOG, N_TRACES, CALENDAR, normalization=True, POLICY=None, N_SIMULATION=0, threshold=0) -> None:
         self.name_log = NAME_LOG
         self.normalization_cycle_times = {"BPI_Challenge_2012_W_Two_TS":10000,
                                           "confidential_1000":10000,
@@ -39,7 +39,11 @@ class gym_env(Env):
         self.normalization_cycle_time = self.normalization_cycle_times[self.name_log] if normalization else 0
         #self.median_processing_time = retrieve_median_processing_time(NAME_LOG)
         self.policy = POLICY
-        input_file = './example/' + self.name_log + '/input_' + self.name_log + '.json'
+        self.print = True
+        if threshold > 0:
+            input_file = './example/' + self.name_log + '/input_' + self.name_log + str(threshold) + '.json'
+        else:
+            input_file = './example/' + self.name_log + '/input_' + self.name_log + '.json'
         with open(input_file, 'r') as f:
             input_data = json.load(f)
         self.n_simulation = N_SIMULATION
@@ -72,7 +76,7 @@ class gym_env(Env):
             self.N_TRACES = N_TRACES
         self.CALENDAR = CALENDAR ## "True" If you want to use calendar, "False" otherwise
         self.PATH_LOG = './example/' + self.name_log + '/' + self.name_log + '.xes'
-        self.params = Parameters(PATH_PARAMETERS, self.N_TRACES, self.name_log, self.FEATURE_ROLE)
+        self.params = Parameters(PATH_PARAMETERS, self.N_TRACES, self.name_log, self.FEATURE_ROLE, threshold)
         ### define possible assignments from log
         self.output = self.retrieve_possible_assignments(self.params.RESOURCE_TO_ROLE_LSTM)
 
@@ -112,10 +116,12 @@ class gym_env(Env):
         self.env = simpy.Environment()
         self.simulation_process = SimulationProcess(self.env, self.params, self.CALENDAR)
         self.completed_traces = []
-        if i != None:
+        #if i != None:
+        if self.print:
             utility.define_folder_output("output/output_{}".format(self.name_log))
-            f = open("output/output_{}/simulated_log_{}_{}_{}".format(self.name_log, self.name_log, self.policy, str(i)) + ".csv", 'w')
-            print("output/output_{}/simulated_log_{}_{}_{}".format(self.name_log, self.name_log, self.policy, str(i)) + ".csv")
+            calendar = 'CALENDAR' if self.CALENDAR else 'NOT_CALENDAR'
+            f = open("output/output_{}/simulated_log_{}_{}_{}_{}".format(self.name_log, self.name_log, self.policy, calendar, str(i)) + ".csv", 'w')
+            print("output/output_{}/simulated_log_{}_{}_{}_{}".format(self.name_log, self.name_log, self.policy, calendar, str(i)) + ".csv")
             writer = csv.writer(f)
             writer.writerow(Buffer(writer).get_buffer_keys())
         else:
@@ -320,7 +326,6 @@ class gym_env(Env):
         state = self.get_state()
         state_simulator = self.simulation_process.get_state()
         mask = [0 for _ in range(len(self.output))]
-
         for resource in self.resources:
             for task_type in self.task_types:
                 if state[self.input.index(resource + '_availability')] > 0 and state[self.input.index(task_type)] > 0:

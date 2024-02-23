@@ -1,0 +1,80 @@
+{
+    "start_timestamp": "2012-02-13 20:42:08",
+    "traces": 1200,
+    "traces_entire_log": 8616,
+    "interTriggerTimer": {
+        "type": "custom"
+    },
+    "resource": {
+        "10609.0":{"resources":["10609.0"],"calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 8, "hour_max": 14}},
+        "NOT_SET":{"resources":["NOT_SET"],"calendar": {"days": [0, 1, 2, 3, 4, 5], "hour_min": 9, "hour_max": 17}},
+        "10138.0":{"resources":["10138.0"],"calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 8, "hour_max": 14}},
+        "10188.0":{"resources":["10188.0"],"calendar": {"days": [0, 1, 2, 3, 4, 5], "hour_min": 9, "hour_max": 17}},
+        "10972.0":{"resources":["10972.0"],"calendar": {"days": [0, 1, 2, 3, 4, 5], "hour_min": 9, "hour_max": 17}}
+
+    },
+    "probability": {
+    },
+    "processing_time": {
+        "W_Beoordelen fraude":  {
+            "name": "custom"
+        },
+        "W_Afhandelen leads":  {
+            "name": "custom"
+        },
+        "W_Nabellen incomplete dossiers":  {
+            "name": "custom"
+        },
+        "W_Valideren aanvraag":  {
+            "name": "custom"
+        },
+        "W_Nabellen offertes":  {
+            "name": "custom"
+        },
+        "W_Completeren aanvraag":  {
+            "name": "custom"
+        }
+    },
+    "resource_table": [
+        {
+            "role": "Role 1",
+            "task": "A_SUBMITTED"
+        },
+        {
+            "role": "Role 2",
+            "task": "A_PARTLYSUBMITTED"
+        },
+        {
+            "role": "Role 2",
+            "task": "A_PREACCEPTED"
+        },
+        {
+            "role": "Role 1",
+            "task": "A_ACCEPTED"
+        },
+        {
+            "role": "Role 2",
+            "task": "A_FINALIZED"
+        },
+        {
+            "role": "Role 2",
+            "task": "A_CANCELLED"
+        },
+        {
+            "role": "Role 2",
+            "task": "A_DECLINED"
+        },
+        {
+            "role": "Role 2",
+            "task": "A_APPROVED"
+        },
+        {
+            "role": "Role 2",
+            "task": "A_REGISTERED"
+        },
+        {
+            "role": "Role 2",
+            "task": "A_ACTIVATED"
+        }
+    ]
+}

@@ -1,0 +1,176 @@
+{
+    "ac_index": {
+        "Amend Purchase Requisition": 15,
+        "Amend Request for Quotation": 4,
+        "Analyze Purchase Requisition": 7,
+        "Analyze Quotation Comparison Map": 8,
+        "Analyze Request for Quotation": 3,
+        "Approve Purchase Order for payment": 16,
+        "Authorize Supplier's Invoice payment": 19,
+        "Choose best option": 9,
+        "Confirm Purchase Order": 12,
+        "Create Purchase Order": 11,
+        "Create Purchase Requisition": 1,
+        "Create Quotation comparison Map": 6,
+        "Create Request for Quotation": 2,
+        "Deliver Goods Services": 13,
+        "End": 22,
+        "Pay Invoice": 20,
+        "Release Purchase Order": 14,
+        "Release Supplier's Invoice": 18,
+        "Send Invoice": 17,
+        "Send Request for Quotation to Supplier": 5,
+        "Settle Conditions With Supplier": 10,
+        "Settle Dispute With Supplier": 21,
+        "Start": 0
+    },
+    "dense_act": "linear",
+    "generated_at": "07/06/2021 17:12:48",
+    "inter_mean_states": {
+        "tasks": {
+            "Amend Purchase Requisition": 0.0017944843218738193,
+            "Amend Request for Quotation": 0.057329051756705704,
+            "Analyze Purchase Requisition": 0.03333962976955043,
+            "Analyze Quotation Comparison Map": 0.0646014355874575,
+            "Analyze Request for Quotation": 0.1774650547789951,
+            "Approve Purchase Order for payment": 0.030978466188137516,
+            "Authorize Supplier's Invoice payment": 0.0,
+            "Choose best option": 0.0,
+            "Confirm Purchase Order": 0.06752927842840951,
+            "Create Purchase Order": 0.048073290517567056,
+            "Create Purchase Requisition": 0.1258027956176804,
+            "Create Quotation comparison Map": 0.4004533434076313,
+            "Create Request for Quotation": 0.04731771817151492,
+            "Deliver Goods Services": 2.7682281828485076,
+            "End": 0.0,
+            "Pay Invoice": 0.055817907064601435,
+            "Release Purchase Order": 0.032489610880241784,
+            "Release Supplier's Invoice": 0.04127313940309785,
+            "Send Invoice": 0.0,
+            "Send Request for Quotation to Supplier": 0.07225160559123536,
+            "Settle Conditions With Supplier": 0.8897808840196448,
+            "Settle Dispute With Supplier": 0.06582924064979222,
+            "Start": 0.0
+        },
+        "wip": 40.04268983755195
+    },
+    "l_size": 100,
+    "loss": 0.0275351302698254,
+    "lstm_act": "selu",
+    "n_size": 10,
+    "optim": "Nadam",
+    "output": "output_files/20210607_8A1331E2_CFA5_438E_ACD3_06A78EEB25A7/20210607_5C5B7249_C284_4690_BD0F_32BFCB805B26",
+    "roles": {
+        "Role 1": [
+            "Fjodor Kowalski",
+            "Immanuel Karagianni",
+            "Kim Passa",
+            "Anne Olwada"
+        ],
+        "Role 2": [
+            "Esmeralda Clay",
+            "Kiu Kan",
+            "Carmen Finacse"
+        ],
+        "Role 3": [
+            "Maris Freeman",
+            "Heinz Gutschmidt",
+            "Francis Odell"
+        ],
+        "Role 4": [
+            "Francois de Perrier",
+            "Magdalena Predutta"
+        ],
+        "Role 5": [
+            "Karalda Nimwada",
+            "Pedro Alvares"
+        ]
+    },
+    "roles_table": [
+        {
+            "role": "Role 1",
+            "task": "Amend Purchase Requisition"
+        },
+        {
+            "role": "Role 5",
+            "task": "Settle Dispute With Supplier"
+        },
+        {
+            "role": "Role 3",
+            "task": "Create Request for Quotation"
+        },
+        {
+            "role": "Role 3",
+            "task": "Analyze Purchase Requisition"
+        },
+        {
+            "role": "Role 1",
+            "task": "Amend Request for Quotation"
+        },
+        {
+            "role": "Role 5",
+            "task": "Release Supplier's Invoice"
+        },
+        {
+            "role": "Role 4",
+            "task": "Settle Conditions With Supplier"
+        },
+        {
+            "role": "Role 4",
+            "task": "Send Request for Quotation to Supplier"
+        },
+        {
+            "role": "Role 2",
+            "task": "Send Invoice"
+        },
+        {
+            "role": "Role 5",
+            "task": "Pay Invoice"
+        },
+        {
+            "role": "Role 2",
+            "task": "Deliver Goods Services"
+        },
+        {
+            "role": "Role 1",
+            "task": "Analyze Quotation Comparison Map"
+        },
+        {
+            "role": "Role 4",
+            "task": "Create Purchase Order"
+        },
+        {
+            "role": "Role 2",
+            "task": "Confirm Purchase Order"
+        },
+        {
+            "role": "Role 1",
+            "task": "Choose best option"
+        },
+        {
+            "role": "Role 5",
+            "task": "Authorize Supplier's Invoice payment"
+        },
+        {
+            "role": "Role 4",
+            "task": "Approve Purchase Order for payment"
+        },
+        {
+            "role": "Role 4",
+            "task": "Create Quotation comparison Map"
+        },
+        {
+            "role": "Role 1",
+            "task": "Release Purchase Order"
+        },
+        {
+            "role": "Role 1",
+            "task": "Create Purchase Requisition"
+        },
+        {
+            "role": "Role 4",
+            "task": "Analyze Request for Quotation"
+        }
+    ],
+    "sim_metric": "val_loss"
+}

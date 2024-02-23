@@ -1,0 +1,86 @@
+{
+    "ac_index": {
+        "End": 8,
+        "Start": 0,
+        "W_Assess potential fraud": 6,
+        "W_Call after offers": 3,
+        "W_Call incomplete files": 5,
+        "W_Complete application": 2,
+        "W_Handle leads": 1,
+        "W_Shortened completion": 7,
+        "W_Validate application": 4
+    },
+    "dense_act": "linear",
+    "generated_at": "25/05/2021 21:20:31",
+    "inter_mean_states": {
+        "tasks": {
+            "End": 0.0,
+            "Start": 0.0,
+            "W_Assess potential fraud": 0.09813081687919567,
+            "W_Call after offers": 0.9313180257109951,
+            "W_Call incomplete files": 1.0686949439193185,
+            "W_Complete application": 1.4989287085360918,
+            "W_Handle leads": 0.04479710310337314,
+            "W_Shortened completion": 0.0003190529057159755,
+            "W_Validate application": 2.9351596302099003
+        },
+        "wip": 1028.7251216551324
+    },
+    "l_size": 50,
+    "loss": 0.0092628683632938,
+    "lstm_act": "tanh",
+    "n_size": 5,
+    "optim": "Nadam",
+    "output": "output_files/20210525_F8A4BC6C_DE48_4009_8935_74CA38E899C1/20210525_DB326899_45AF_413E_971E_EA2642A7F200",
+    "roles": {
+        "Role 1": [
+            "User_14",
+            "User_2",
+            "User_87",
+            "User_3",
+            "User_49",
+            "User_43"
+        ],
+        "Role 2": [
+            "User_144",
+            "User_138"
+        ],
+        "Role 3": [
+            "User_145"
+        ],
+        "Role 4": [
+            "User_142"
+        ]
+    },
+    "roles_table": [
+        {
+            "role": "Role 1",
+            "task": "W_Shortened completion"
+        },
+        {
+            "role": "Role 2",
+            "task": "W_Assess potential fraud"
+        },
+        {
+            "role": "Role 1",
+            "task": "W_Handle leads"
+        },
+        {
+            "role": "Role 1",
+            "task": "W_Complete application"
+        },
+        {
+            "role": "Role 1",
+            "task": "W_Call incomplete files"
+        },
+        {
+            "role": "Role 1",
+            "task": "W_Call after offers"
+        },
+        {
+            "role": "Role 1",
+            "task": "W_Validate application"
+        }
+    ],
+    "sim_metric": "val_loss"
+}
