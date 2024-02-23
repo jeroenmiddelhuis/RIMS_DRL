@@ -30,12 +30,12 @@ if __name__ == "__main__":
 class gym_env(Env):
     def __init__(self, NAME_LOG, N_TRACES, CALENDAR, normalization=True, POLICY=None, N_SIMULATION=0) -> None:
         self.name_log = NAME_LOG
-        self.normalization_cycle_times = {"BPI_Challenge_2012_W_Two_TS":5102,
-                                          "confidential_1000":30042,
-                                          "ConsultaDataMining201618":188645,
-                                          "PurchasingExample":434950,
-                                          "BPI_Challenge_2017_W_Two_TS":1077125,
-                                          "Productions":265928}
+        self.normalization_cycle_times = {"BPI_Challenge_2012_W_Two_TS":10000,
+                                          "confidential_1000":10000,
+                                          "ConsultaDataMining201618":10000,
+                                          "PurchasingExample":10000,
+                                          "BPI_Challenge_2017_W_Two_TS":10000,
+                                          "Productions":10000}
         self.normalization_cycle_time = self.normalization_cycle_times[self.name_log] if normalization else 0
         #self.median_processing_time = retrieve_median_processing_time(NAME_LOG)
         self.policy = POLICY
@@ -51,8 +51,8 @@ class gym_env(Env):
         # The inputs are: 1) resource availability, 2) if a resource is busy, to what task_type, 3) number of tasks for each activity
         self.input = [resource + '_availability' for resource in self.resources] + \
                      [resource + '_to_task_type' for resource in self.resources] + \
-                     [task_type for task_type in self.task_types] + \
-                     ['day', 'hour']
+                     [task_type for task_type in self.task_types]# + \
+                     #['day', 'hour']
 
         # The outputs are: the assignments (resource, task_type)
         #self.output = [(resource, task_type) for task_type in self.task_types for resource in self.resources] + ['Postpone']
@@ -130,8 +130,9 @@ class gym_env(Env):
             prev = itime
             parallel_object = utility.ParallelObject()
             time_trace = self.env.now
+            _print = True if writer != None else False
             token = Token(i, net, im, self.params, self.simulation_process, prefix, 'sequential', writer, parallel_object,
-                          itime, self.env, self.CALENDAR, None, print=False)
+                          itime, self.env, self.CALENDAR, None, _print=_print)
             self.tokens[i] = token
             self.env.process(token.inter_trigger_time(itime))
             
@@ -150,13 +151,13 @@ class gym_env(Env):
         if self.output[action] == 'Postpone':
             self.nr_postpone += 1
         self.nr_steps += 1
-        if self.nr_steps % 5000 == 0:
-            env_state = self.simulation_process.get_state()
+        if self.nr_steps % 20000 == 0:
+            #env_state = self.simulation_process.get_state()
             print('Steps:', self.nr_steps)
-            state_print = self.get_state()
-            print('State', [(k, state_print[i]) for i, k in enumerate(self.input)])
-            print('week/day', [env_state['time'].weekday(), env_state['time']])
-            print('Postpone actions:', self.nr_postpone, '/5000')
+            #state_print = self.get_state()
+            #print('State', [(k, state_print[i]) for i, k in enumerate(self.input)])
+            #print('week/day', [env_state['time'].weekday(), env_state['time']])
+            print('Postpone actions:', self.nr_postpone, '/20000')
             self.nr_postpone = 0
 
         if self.output[action] != 'Postpone':                
@@ -201,15 +202,13 @@ class gym_env(Env):
 
         if len(self.tokens) == 0:
             isTerminated = True
-            print('Mean cycle time:', np.mean([cycle_time for (trace_id, cycle_time) in self.simulation_process.traces['ended']]))
-            print('Total reward:', sum([1 / (1 + (cycle_time/self.normalization_cycle_time)) for (trace_id, cycle_time) in self.simulation_process.traces['ended']]))  
-            print([(cycle_time) for (trace_id, cycle_time) in self.simulation_process.traces['ended']])    
+            self.mean_cycle_time = np.mean([cycle_time for (trace_id, cycle_time) in self.simulation_process.traces['ended']])
+            self.total_reward = sum([1 / (1 + (cycle_time/self.normalization_cycle_time)) for (trace_id, cycle_time) in self.simulation_process.traces['ended']])
+            print('Mean cycle time:', self.mean_cycle_time, flush=True)
+            print('Total reward:', self.total_reward, flush=True)
         else:
             isTerminated = False
         return self.get_state(), reward, isTerminated, {}, {}
-
-
-
 
     def step_baseline(self, action):
         if action is not None:
@@ -228,7 +227,7 @@ class gym_env(Env):
             isTerminated = True
             print(self.env.now)
             print('Mean cycle time:', np.mean([cycle_time for (trace_id, cycle_time) in self.simulation_process.traces['ended']]))
-            print([(cycle_time) for (trace_id, cycle_time) in self.simulation_process.traces['ended']])   
+            print([(cycle_time) for (trace_id, cycle_time) in self.simulation_process.traces['ended']])
         else:
             isTerminated = False       
         return self.get_state(), reward, isTerminated, {}, {}
@@ -313,8 +312,8 @@ class gym_env(Env):
             task_types_num = [0.0 for _ in range(len(self.task_types))]
         #wip = [(len(env_state['traces']['ongoing'])+1)/1000]
 
-        time = [env_state['time'].weekday()/6, (env_state['time'].hour*3600 + env_state['time'].minute*60 + env_state['time'].second)/(24*3600)]
-        return np.array(resource_available + resource_assigned_to + task_types_num + time)
+        #time = [env_state['time'].weekday()/6, (env_state['time'].hour*3600 + env_state['time'].minute*60 + env_state['time'].second)/(24*3600)]
+        return np.array(resource_available + resource_assigned_to + task_types_num)# + time
 
     # Create an action mask which invalidates ineligible actions
     def action_masks(self) -> List[bool]:

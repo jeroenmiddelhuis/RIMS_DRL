@@ -10,7 +10,7 @@ import numpy as np
 import scipy.stats as st
 import json
 from collections import defaultdict
-
+import sys, os
 
 
 def FIFO(state, tokens_pending, possible_action):
@@ -139,7 +139,7 @@ def confidence_interval(data):
     s = np.std(data, ddof=1)
     ci_upper = x_bar + t_star * s / np.sqrt(n)
     ci_lower = x_bar - t_star * s / np.sqrt(n)
-
+    print(x_bar, ci_lower, ci_upper)
     return ci_lower, ci_upper
 
 
@@ -160,7 +160,7 @@ def evaluate(NAME, POLICY, data):
                     'percentile_25_50_75': list(np.percentile(cycle_time, [25, 50, 75]))}
 
 def run_simulation(NAME_LOG, POLICY, N_SIMULATION, model=None, median_processing_time=None):
-    env_simulator = gym_env(NAME_LOG, N_TRACES, CALENDAR, normalization=True)
+    env_simulator = gym_env(NAME_LOG, N_TRACES, CALENDAR)
     for i in range(0, N_SIMULATION):
         obs = env_simulator.reset(i=i)
         isTerminated = False
@@ -187,24 +187,42 @@ def run_simulation(NAME_LOG, POLICY, N_SIMULATION, model=None, median_processing
 
 
 ### Path DRL model
-#model = MaskablePPO.load("/Users/francescameneghello/Downloads/models_RL_integration/confidential_1000_159_True_6/model_final.zip/")
-model = None
-NAME_LOG = 'BPI_Challenge_2017_W_Two_TS'
-N_TRACES = 1000
-CALENDAR = False
-POLICY = 'RANDOM'
-N_SIMULATION = 25
 
-data = {'FIFO_activity': {}, 'FIFO_case': {}, 'RANDOM': {}, 'SPT': {}}
+if len(sys.argv) > 1:    
+    NAME_LOG = sys.argv[1]#'BPI_Challenge_2017_W_Two_TS'
+    if not sys.argv[2] == 'from_input_data':    
+        N_TRACES = int(sys.argv[2])#2000
+    else:
+        N_TRACES = sys.argv[2]
+        traces = {"BPI_Challenge_2012_W_Two_TS":1200,
+                "confidential_1000":159,
+                "ConsultaDataMining201618":181,
+                "PurchasingExample":101,
+                "BPI_Challenge_2017_W_Two_TS":5789,
+                "Productions":45}
+    CALENDAR = True if sys.argv[3] == "True" else False
+    model = MaskablePPO.load(os.getcwd() + "/tmp_training_phase_1/" + f"{NAME_LOG}_{traces[NAME_LOG]}_{CALENDAR}" + "/model_final.zip")
+    N_SIMULATION = 25
+else:
+    model = None
+    NAME_LOG = 'BPI_Challenge_2012_W_Two_TS'#'BPI_Challenge_2017_W_Two_TS', 'confidential_1000', 'ConsultaDataMining201618','PurchasingExample'
+    N_TRACES = 1000
+    CALENDAR = True
+    POLICY = 'None'
+    N_SIMULATION = 25
+
+
+data = {'FIFO_activity': {}, 'FIFO_case': {}, 'RANDOM': {}, 'SPT': {}, 'None': {}}
 ## i number of simulations for log
-for POLICY in ['FIFO_case', 'RANDOM', 'SPT']:
+for POLICY in ['None']:
     if POLICY == 'SPT':
         median_processing_time = retrieve_median_processing_time(NAME_LOG)
         run_simulation(NAME_LOG, POLICY, N_SIMULATION, median_processing_time=median_processing_time)
     elif POLICY == 'FIFO_activity' or POLICY == 'FIFO_case' or POLICY == 'RANDOM':
         run_simulation(NAME_LOG, POLICY, N_SIMULATION)
     else:
-        run_simulation(NAME_LOG, POLICY, N_SIMULATION, model=model)
+        pass
+        #run_simulation(NAME_LOG, POLICY, N_SIMULATION, model=model)
     evaluate(NAME_LOG, POLICY, data)
 
 with open('output/output_' + NAME_LOG + '/results.json', 'w') as f:

@@ -21,7 +21,7 @@ from stable_baselines3.common.logger import configure
 from gymnasium.wrappers import normalize
 from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv
 
-from callbacks import SaveOnBestTrainingRewardCallback
+from callbacks import SaveOnBestTrainingRewardCallback, EvalPolicyCallback
 from callbacks import custom_schedule, linear_schedule
 
 
@@ -42,8 +42,8 @@ if len(sys.argv) > 1:
     else:
         normalization = True
 else:
-    NAME_LOG = 'Productions'
-    N_TRACES = 'from_input_data'
+    NAME_LOG = 'PurchasingExample'
+    N_TRACES = 100#'from_input_data'
     CALENDAR = True
     normalization = True
 
@@ -51,17 +51,16 @@ else:
 
 if __name__ == '__main__':
     #if true, load model for a new round of training
-    num_cpu = 1
     load_model = False
     postpone_penalty = 0
     time_steps = 1280000
-    n_steps = 6400# Number of steps for each network update
-    if NAME_LOG == 'BPI_Challenge_2017_W_Two_TS':
-        n_steps = 38400
+    n_steps = 1000# Number of steps for each network update
+    # if NAME_LOG == 'BPI_Challenge_2017_W_Two_TS':
+    #     n_steps = 38400
     # Create log dir
     now = datetime.datetime.now()
     #log_dir = f"./tmp/{NAME_LOG}_{now.year}_{now.month}_{now.day}_{now.hour}_{now.minute}/"  # Logging training results
-    log_dir = f"./tmp/{NAME_LOG}_{N_TRACES}_{CALENDAR}/"
+    log_dir = f"tmp/{NAME_LOG}_{N_TRACES}_{CALENDAR}/"
     os.makedirs(log_dir, exist_ok=True)
 
     #print(f'Training agent for {config_type} with {time_steps} timesteps in updates of {n_steps} steps.')
@@ -72,28 +71,32 @@ if __name__ == '__main__':
     env = Monitor(env_simulator, log_dir)
 
     # Create the model
-    model = MaskablePPO(CustomPolicy, env_simulator, clip_range=0.2, learning_rate=3e-5, n_steps=int(n_steps), batch_size=256, gamma=0.995, verbose=1)
+    model = MaskablePPO(CustomPolicy, env_simulator, clip_range=0.2, learning_rate=3e-4, n_steps=int(n_steps), batch_size=256, gamma=0.999, verbose=1)
 
     #Logging to tensorboard. To access tensorboard, open a bash terminal in the projects directory, activate the environment (where tensorflow should be installed) and run the command in the following line
     # tensorboard --logdir ./tmp/
     # then, in a browser page, access localhost:6006 to see the board
     model.set_logger(configure(log_dir, ["stdout", "csv", "tensorboard"]))
 
+    # checkpoint_callback = CheckpointCallback(
+    #     save_freq=100000,
+    #     save_path=log_dir,
+    #     name_prefix="rl_model",
+    #     save_replay_buffer=True,
+    #     save_vecnormalize=True,
+    # )
     # Train the agent
-    checkpoint_callback = CheckpointCallback(
-        save_freq=100000,
-        save_path=log_dir,
-        name_prefix="rl_model",
-        save_replay_buffer=True,
-        save_vecnormalize=True,
-    )
+    eval_env = gym_env(NAME_LOG, N_TRACES, CALENDAR, normalization=normalization)  # Initialize env
+    eval_env = Monitor(eval_env, log_dir)
+    eval_callback = EvalPolicyCallback(check_freq=1*int(n_steps), nr_evaluations=1, log_dir=log_dir, eval_env=eval_env)
 
-    model.learn(total_timesteps=int(time_steps), callback=checkpoint_callback)
+    callback = SaveOnBestTrainingRewardCallback(check_freq=1000, log_dir=log_dir)
+    model.learn(total_timesteps=int(time_steps), callback=eval_callback)
 
     model.save(f'{log_dir}/model_final')
 
-    # Train the agent
-    #callback = SaveOnBestTrainingRewardCallback(check_freq=int(n_steps), log_dir=log_dir)
+
+    
     #print(type(time_steps), type(callback))
     #model.learn(total_timesteps=int(time_steps), callback=callback)
 
