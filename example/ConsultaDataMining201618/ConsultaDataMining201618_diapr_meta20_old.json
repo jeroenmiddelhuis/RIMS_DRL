@@ -1,0 +1,153 @@
+{
+    "ac_index": {
+        "Avanzar recepcion documentos": 16,
+        "Cancelar Solicitud": 5,
+        "Cancelar curso": 15,
+        "End": 17,
+        "Evaluacion curso": 9,
+        "Homologacion por grupo de cursos": 4,
+        "Notificacion estudiante cancelacion soli": 6,
+        "Radicar Solicitud Homologacion": 2,
+        "Recepcion de documentos": 7,
+        "Revisar curso": 8,
+        "Start": 0,
+        "Traer informacion estudiante - banner": 1,
+        "Transferir Creditos": 12,
+        "Transferir creditos homologables": 13,
+        "Validacion final": 10,
+        "Validar solicitud": 3,
+        "Validar solicitud / pre-homologacion": 14,
+        "Visto Bueno Cierre Proceso": 11
+    },
+    "dense_act": "linear",
+    "generated_at": "25/05/2021 12:05:28",
+    "inter_mean_states": {
+        "tasks": {
+            "Avanzar recepcion documentos": 0.0020161290322580645,
+            "Cancelar Solicitud": 0.26537298387096775,
+            "Cancelar curso": 0.0010080645161290322,
+            "End": 0.0,
+            "Evaluacion curso": 0.07787298387096774,
+            "Homologacion por grupo de cursos": 0.5632560483870968,
+            "Notificacion estudiante cancelacion soli": 0.0,
+            "Radicar Solicitud Homologacion": 0.10231854838709678,
+            "Recepcion de documentos": 0.014868951612903226,
+            "Revisar curso": 0.04788306451612903,
+            "Start": 0.0,
+            "Traer informacion estudiante - banner": 0.0,
+            "Transferir Creditos": 0.0005040322580645161,
+            "Transferir creditos homologables": 0.0010080645161290322,
+            "Validacion final": 0.010080645161290322,
+            "Validar solicitud": 0.24168346774193547,
+            "Validar solicitud / pre-homologacion": 0.012852822580645162,
+            "Visto Bueno Cierre Proceso": 0.03276209677419355
+        },
+        "wip": 42.10181451612903
+    },
+    "l_size": 100,
+    "loss": 0.0233358507975935,
+    "lstm_act": "tanh",
+    "n_size": 10,
+    "optim": "Nadam",
+    "output": "output_files/20210525_8BF1343B_6BE6_4F36_8BF9_74758D32A836/20210525_9E8A03A5_F7EA_493F_A9E8_330B545A1A7D",
+    "roles": {
+        "Role 1": [
+            "8824"
+        ],
+        "Role 2": [
+            "22404",
+            "1707",
+            "677",
+            "19019"
+        ],
+        "Role 3": [
+            "15930",
+            "3445"
+        ],
+        "Role 4": [
+            "26789"
+        ],
+        "Role 5": [
+            "26757"
+        ],
+        "Role 6": [
+            "10923"
+        ],
+        "Role 7": [
+            "3003"
+        ],
+        "Role 8": [
+            "22491"
+        ],
+        "Role 9": [
+            "1"
+        ]
+    },
+    "roles_table": [
+        {
+            "role": "Role 8",
+            "task": "Avanzar recepcion documentos"
+        },
+        {
+            "role": "Role 1",
+            "task": "Cancelar curso"
+        },
+        {
+            "role": "Role 2",
+            "task": "Recepcion de documentos"
+        },
+        {
+            "role": "Role 3",
+            "task": "Transferir Creditos"
+        },
+        {
+            "role": "Role 3",
+            "task": "Transferir creditos homologables"
+        },
+        {
+            "role": "Role 4",
+            "task": "Evaluacion curso"
+        },
+        {
+            "role": "Role 2",
+            "task": "Validar solicitud / pre-homologacion"
+        },
+        {
+            "role": "Role 2",
+            "task": "Validacion final"
+        },
+        {
+            "role": "Role 3",
+            "task": "Visto Bueno Cierre Proceso"
+        },
+        {
+            "role": "Role 2",
+            "task": "Revisar curso"
+        },
+        {
+            "role": "Role 3",
+            "task": "Homologacion por grupo de cursos"
+        },
+        {
+            "role": "Role 2",
+            "task": "Notificacion estudiante cancelacion soli"
+        },
+        {
+            "role": "Role 2",
+            "task": "Cancelar Solicitud"
+        },
+        {
+            "role": "Role 2",
+            "task": "Validar solicitud"
+        },
+        {
+            "role": "Role 1",
+            "task": "Traer informacion estudiante - banner"
+        },
+        {
+            "role": "Role 1",
+            "task": "Radicar Solicitud Homologacion"
+        }
+    ],
+    "sim_metric": "val_loss"
+}

@@ -1,0 +1,120 @@
+{
+    "start_timestamp": "2012-02-13 20:42:08",
+    "traces": 181,
+    "traces_entire_log": 954,
+    "interTriggerTimer": {
+        "type": "custom"
+    },
+    "resource": {
+        "8824":{"resources":["8824"],"calendar":{"days":[1, 2, 3, 4],"hour_min":14,"hour_max":22}},
+        "22404":{"resources":["22404"],"calendar":{"days":[3, 4, 2, 0, 6, 1, 5],"hour_min":9,"hour_max":19}},
+        "15930":{"resources":["15930"],"calendar":{"days":[3, 2, 0, 4, 1],"hour_min":3,"hour_max":22}},
+        "1707":{"resources":["1707"],"calendar":{"days":[2, 3, 4, 5, 1, 6, 0],"hour_min":8,"hour_max":18}},
+        "26757":{"resources":["26757"],"calendar":{"days":[1, 2, 4, 6, 0, 3],"hour_min":9,"hour_max":15}},
+        "26789":{"resources":["26789"],"calendar":{"days":[1, 2, 4, 6, 0, 3],"hour_min":7,"hour_max":14}},
+        "677":{"resources":["677"],"calendar":{"days":[3, 1, 4, 0, 6, 5, 2],"hour_min":9,"hour_max":19}},
+        "19019":{"resources":["19019"],"calendar":{"days":[2, 3, 0, 5, 1, 4, 6],"hour_min":9,"hour_max":14}},
+        "3445":{"resources":["3445"],"calendar":{"days":[0, 1, 4, 2, 3],"hour_min":9,"hour_max":19}},
+        "1343":{"resources":["1343"],"calendar":{"days":[2, 4, 0, 1, 5, 3],"hour_min":10,"hour_max":18}},
+        "4560":{"resources":["4560"],"calendar":{"days":[4, 1, 2, 0, 6, 3],"hour_min":9,"hour_max":18}},
+        "1007":{"resources":["1007"],"calendar":{"days":[0, 2, 4, 3, 1, 5],"hour_min":9,"hour_max":18}},
+        "12535":{"resources":["12535"],"calendar":{"days":[1, 3, 4, 0, 2],"hour_min":9,"hour_max":14}},
+        "22491":{"resources":["22491"],"calendar":{"days":[2, 4, 3, 0, 1],"hour_min":7,"hour_max":15}},
+        "157":{"resources":["157"],"calendar":{"days":[1, 3, 4, 0, 2],"hour_min":9,"hour_max":14}},
+        "22475":{"resources":["22475"],"calendar":{"days":[2, 1, 4, 3, 0],"hour_min":15,"hour_max":22}}
+    },
+    "processing_time": {
+        "Avanzar recepcion documentos":  {
+            "name": "custom"
+        },
+        "Cancelar Solicitud":  {
+            "name": "custom"
+        },
+        "Cancelar curso":  {
+            "name": "custom"
+        },
+        "Evaluacion curso":  {
+            "name": "custom"
+        },
+        "Homologacion por grupo de cursos":  {
+            "name": "custom"
+        },
+        "Notificacion estudiante cancelacion soli":  {
+            "name": "custom"
+        },
+        "Radicar Solicitud Homologacion":  {
+            "name": "custom"
+        },
+        "Recepcion de documentos":  {
+            "name": "custom"
+        },
+        "Revisar curso":  {
+            "name": "custom"
+        },
+        "Traer informacion estudiante - banner":  {
+            "name": "custom"
+        },
+        "Transferir Creditos":  {
+            "name": "custom"
+        },
+        "Transferir creditos homologables":  {
+            "name": "custom"
+        },
+        "Validacion final":  {
+            "name": "custom"
+        },
+        "Validar solicitud":  {
+            "name": "custom"
+        },
+        "Validar solicitud / pre-homologacion":  {
+            "name": "custom"
+        },
+        "Visto Bueno Cierre Proceso":  {
+            "name": "custom"
+        }
+    },
+    "probability": {
+    },
+    "resource_table": [
+        {
+            "role": "Role 1",
+            "task": "A_SUBMITTED"
+        },
+        {
+            "role": "Role 2",
+            "task": "A_PARTLYSUBMITTED"
+        },
+        {
+            "role": "Role 2",
+            "task": "A_PREACCEPTED"
+        },
+        {
+            "role": "Role 1",
+            "task": "A_ACCEPTED"
+        },
+        {
+            "role": "Role 2",
+            "task": "A_FINALIZED"
+        },
+        {
+            "role": "Role 2",
+            "task": "A_CANCELLED"
+        },
+        {
+            "role": "Role 2",
+            "task": "A_DECLINED"
+        },
+        {
+            "role": "Role 2",
+            "task": "A_APPROVED"
+        },
+        {
+            "role": "Role 2",
+            "task": "A_REGISTERED"
+        },
+        {
+            "role": "Role 2",
+            "task": "A_ACTIVATED"
+        }
+    ]
+}

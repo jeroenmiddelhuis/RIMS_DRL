@@ -1,0 +1,84 @@
+{
+    "ac_index": {
+        "End": 7,
+        "Start": 0,
+        "W_Afhandelen leads": 1,
+        "W_Beoordelen fraude": 4,
+        "W_Completeren aanvraag": 2,
+        "W_Nabellen incomplete dossiers": 6,
+        "W_Nabellen offertes": 3,
+        "W_Valideren aanvraag": 5
+    },
+    "dense_act": "linear",
+    "generated_at": "07/06/2021 19:27:48",
+    "inter_mean_states": {
+        "tasks": {
+            "End": 0.0,
+            "Start": 0.0,
+            "W_Afhandelen leads": 0.5179552782382811,
+            "W_Beoordelen fraude": 0.0015011683005469473,
+            "W_Completeren aanvraag": 1.015129165742034,
+            "W_Nabellen incomplete dossiers": 0.560940906183508,
+            "W_Nabellen offertes": 0.49659952745832625,
+            "W_Valideren aanvraag": 1.2888378346626288
+        },
+        "wip": 288.7975380839871
+    },
+    "l_size": 100,
+    "loss": 0.0154004609212279,
+    "lstm_act": "selu",
+    "n_size": 15,
+    "optim": "Nadam",
+    "output": "output_files/20210607_6C6147DD_2CB9_4936_BCDD_9CFFB318B430/20210607_D91A33A8_58A5_40E6_AC1D_8880EB7FF104",
+    "roles": {
+        "Role 1": [
+            "NOT_SET"
+        ],
+        "Role 2": [
+            "10609.0",
+            "10138.0"
+        ],
+        "Role 3": [
+            "10899.0"
+        ],
+        "Role 4": [
+            "10935.0"
+        ],
+        "Role 5": [
+            "10779.0"
+        ],
+        "Role 6": [
+            "10188.0"
+        ],
+        "Role 7": [
+            "11269.0"
+        ]
+    },
+    "roles_table": [
+        {
+            "role": "Role 6",
+            "task": "W_Beoordelen fraude"
+        },
+        {
+            "role": "Role 1",
+            "task": "W_Afhandelen leads"
+        },
+        {
+            "role": "Role 1",
+            "task": "W_Nabellen incomplete dossiers"
+        },
+        {
+            "role": "Role 2",
+            "task": "W_Valideren aanvraag"
+        },
+        {
+            "role": "Role 1",
+            "task": "W_Nabellen offertes"
+        },
+        {
+            "role": "Role 1",
+            "task": "W_Completeren aanvraag"
+        }
+    ],
+    "sim_metric": "val_loss"
+}

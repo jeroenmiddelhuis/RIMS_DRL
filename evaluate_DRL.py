@@ -12,7 +12,6 @@ import json
 from collections import defaultdict
 
 
-
 def FIFO(state, tokens_pending, possible_action):
     if len(tokens_pending) > 0 and len(state['resource_available']) > 0:
         possible_ass = []
@@ -56,13 +55,10 @@ def FIFO_case(state, tokens_pending, possible_action):
         else:
             #In order of arrival time find the first possible allocation
             list_tokens_pending = list(tokens_pending.keys())
-            #print('LIST TOKENS PENDING', list_tokens_pending)
             next_ass = None
             while len(list_tokens_pending) > 0:
                 first_case = min(list_tokens_pending)
-                #print('FIST CASE', first_case)
                 possible_ass_token = [a for a in possible_ass if a[0] == first_case]
-                #print('POSSIBLE ASSIGN', possible_ass_token)
                 if len(possible_ass_token) > 0:
                     next_ass = random.choice(possible_ass_token)
                     list_tokens_pending = []
@@ -75,6 +71,7 @@ def FIFO_case(state, tokens_pending, possible_action):
 
 def RANDOM(state, tokens_pending, possible_action):
     next_ass = None
+    #print('TOKEN pendings', tokens_pending, "N resource available", len(state['resource_available']))
     if len(tokens_pending) > 0 and len(state['resource_available']) > 0:
         possible_ass = []
         for token in tokens_pending:
@@ -145,6 +142,7 @@ def confidence_interval(data):
 
 def evaluate(NAME, POLICY, data):
     path = 'output/output_' + NAME + '/simulated_log_' + NAME + '_' + POLICY + '*.csv'
+    #path = 'output/output_' + NAME + '/ENTIRE_LOG_CALENDAR/'+POLICY+'/simulated_log_' + NAME + '_' + POLICY + '*.csv'
     all_file = glob.glob(path)
     cycle_time = []
     for file in all_file:
@@ -156,11 +154,12 @@ def evaluate(NAME, POLICY, data):
         for trace in simulated_log:
             cycle_time.append((trace[-1]['end_time'] - trace[0]['start_time']).total_seconds())
     ci_lower, ci_upper = confidence_interval(cycle_time)
-    data[POLICY] = {'values': cycle_time, 'mean': [np.mean(cycle_time), ci_lower, ci_upper],
-                    'percentile_25_50_75': list(np.percentile(cycle_time, [25, 50, 75]))}
+    data[POLICY] = {'values': cycle_time, 'mean': [np.mean(cycle_time), ci_lower, ci_upper]}
+
 
 def run_simulation(NAME_LOG, POLICY, N_SIMULATION, model=None, median_processing_time=None):
-    env_simulator = gym_env(NAME_LOG, N_TRACES, CALENDAR, normalization=True)
+    #NAME_LOG, N_TRACES, CALENDAR, normalization = True, POLICY = None, N_SIMULATION = 0
+    env_simulator = gym_env(NAME_LOG, N_TRACES, CALENDAR, POLICY=POLICY, threshold=10)
     for i in range(0, N_SIMULATION):
         obs = env_simulator.reset(i=i)
         isTerminated = False
@@ -190,14 +189,14 @@ def run_simulation(NAME_LOG, POLICY, N_SIMULATION, model=None, median_processing
 #model = MaskablePPO.load("/Users/francescameneghello/Downloads/models_RL_integration/confidential_1000_159_True_6/model_final.zip/")
 model = None
 NAME_LOG = 'BPI_Challenge_2017_W_Two_TS'
-N_TRACES = 1000
-CALENDAR = False
+N_TRACES = 2000
+CALENDAR = True
 POLICY = 'RANDOM'
-N_SIMULATION = 25
+N_SIMULATION = 1
 
 data = {'FIFO_activity': {}, 'FIFO_case': {}, 'RANDOM': {}, 'SPT': {}}
 ## i number of simulations for log
-for POLICY in ['FIFO_case', 'RANDOM', 'SPT']:
+for POLICY in ['FIFO_case', 'SPT']:
     if POLICY == 'SPT':
         median_processing_time = retrieve_median_processing_time(NAME_LOG)
         run_simulation(NAME_LOG, POLICY, N_SIMULATION, median_processing_time=median_processing_time)
@@ -207,5 +206,8 @@ for POLICY in ['FIFO_case', 'RANDOM', 'SPT']:
         run_simulation(NAME_LOG, POLICY, N_SIMULATION, model=model)
     evaluate(NAME_LOG, POLICY, data)
 
-with open('output/output_' + NAME_LOG + '/results.json', 'w') as f:
+with open('output/output_' + NAME_LOG + '/results_'+NAME_LOG+'.json', 'w') as f:
     json.dump(data, f)
+
+#for POLICY in ['FIFO_activity', 'FIFO_case', 'RANDOM', 'SPT']:
+#    evaluate('BPI_Challenge_2012_W_Two_TS', POLICY, data)

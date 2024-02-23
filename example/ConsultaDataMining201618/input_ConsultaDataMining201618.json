@@ -214,7 +214,6 @@
 "8797":{"resources":["8797"],"calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}},
 "18289":{"resources":["18289"],"calendar": {"days": [0, 1, 2, 3, 4, 5, 6], "hour_min": 0, "hour_max": 23}},
 "10923":{"resources":["10923"],"calendar":{"days":[3, 4, 0],"hour_min":2,"hour_max":18}},
-"1007":{"resources":["1007"],"calendar":{"days":[0, 2, 4, 3, 1, 5],"hour_min":0,"hour_max":23}},
 "15356":{"resources":["15356"],"calendar":{"days":[3, 4],"hour_min":0,"hour_max":23}},
 "7316":{"resources":["7316"],"calendar":{"days":[0, 1],"hour_min":13,"hour_max":16}},
 "2292":{"resources":["2292"],"calendar":{"days":[3, 1, 2, 4, 0],"hour_min":0,"hour_max":23}},
