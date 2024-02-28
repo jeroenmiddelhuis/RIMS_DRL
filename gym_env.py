@@ -30,16 +30,17 @@ if __name__ == "__main__":
 class gym_env(Env):
     def __init__(self, NAME_LOG, N_TRACES, CALENDAR, normalization=True, POLICY=None, N_SIMULATION=0, threshold=0) -> None:
         self.name_log = NAME_LOG
+        self.threshold = threshold
         self.normalization_cycle_times = {"BPI_Challenge_2012_W_Two_TS":10000,
                                           "confidential_1000":10000,
                                           "ConsultaDataMining201618":10000,
                                           "PurchasingExample":10000,
                                           "BPI_Challenge_2017_W_Two_TS":10000,
                                           "Productions":10000}
-        self.normalization_cycle_time = self.normalization_cycle_times[self.name_log] if normalization else 0
+        self.normalization_cycle_time = 10000#= self.normalization_cycle_times[self.name_log] if normalization else 0
         #self.median_processing_time = retrieve_median_processing_time(NAME_LOG)
         self.policy = POLICY
-        self.print = True
+        self.print = False
         if threshold > 0:
             input_file = './example/' + self.name_log + '/input_' + self.name_log + str(threshold) + '.json'
         else:
@@ -55,8 +56,8 @@ class gym_env(Env):
         # The inputs are: 1) resource availability, 2) if a resource is busy, to what task_type, 3) number of tasks for each activity
         self.input = [resource + '_availability' for resource in self.resources] + \
                      [resource + '_to_task_type' for resource in self.resources] + \
-                     [task_type for task_type in self.task_types]# + \
-                     #['day', 'hour']
+                     [task_type for task_type in self.task_types] + \
+                     ['day', 'hour']
 
         # The outputs are: the assignments (resource, task_type)
         #self.output = [(resource, task_type) for task_type in self.task_types for resource in self.resources] + ['Postpone']
@@ -79,6 +80,7 @@ class gym_env(Env):
         self.params = Parameters(PATH_PARAMETERS, self.N_TRACES, self.name_log, self.FEATURE_ROLE, threshold)
         ### define possible assignments from log
         self.output = self.retrieve_possible_assignments(self.params.RESOURCE_TO_ROLE_LSTM)
+        #self.output.remove('Postpone')
 
         # Observation space
         lows = np.array([0 for _ in range(len(self.input))])
@@ -88,7 +90,6 @@ class gym_env(Env):
                                             shape=(len(self.input),),
                                             dtype=np.float64)
 
-        
         # Action space
         self.action_space = spaces.Discrete(len(self.output))
 
@@ -118,10 +119,10 @@ class gym_env(Env):
         self.completed_traces = []
         #if i != None:
         if self.print:
-            utility.define_folder_output("output/output_{}".format(self.name_log))
             calendar = 'CALENDAR' if self.CALENDAR else 'NOT_CALENDAR'
-            f = open("output/output_{}/simulated_log_{}_{}_{}_{}".format(self.name_log, self.name_log, self.policy, calendar, str(i)) + ".csv", 'w')
-            print("output/output_{}/simulated_log_{}_{}_{}_{}".format(self.name_log, self.name_log, self.policy, calendar, str(i)) + ".csv")
+            utility.define_folder_output("output/output_{}_{}_{}".format(self.name_log, calendar, self.threshold))            
+            f = open("output/output_{}_{}_{}/simulated_log_{}_{}_{}".format(self.name_log, calendar, self.threshold, self.name_log, self.policy, str(i)) + ".csv", 'w')
+            print("output/output_{}_{}_{}/simulated_log_{}_{}_{}".format(self.name_log, calendar, self.threshold, self.name_log, self.policy, str(i)) + ".csv")
             writer = csv.writer(f)
             writer.writerow(Buffer(writer).get_buffer_keys())
         else:
@@ -141,7 +142,7 @@ class gym_env(Env):
                           itime, self.env, self.CALENDAR, None, _print=_print)
             self.tokens[i] = token
             self.env.process(token.inter_trigger_time(itime))
-            
+
         not_token_ready = True
         while not_token_ready:
             if len(self.simulation_process.tokens_pending) > 0:
@@ -157,22 +158,24 @@ class gym_env(Env):
         if self.output[action] == 'Postpone':
             self.nr_postpone += 1
         self.nr_steps += 1
-        if self.nr_steps % 20000 == 0:
+        if self.nr_steps % 5000 == 0:
             #env_state = self.simulation_process.get_state()
             print('Steps:', self.nr_steps)
-            #state_print = self.get_state()
+            state_print = self.get_state()
+            print(state_print)
             #print('State', [(k, state_print[i]) for i, k in enumerate(self.input)])
             #print('week/day', [env_state['time'].weekday(), env_state['time']])
-            print('Postpone actions:', self.nr_postpone, '/20000')
+            print('Postpone actions:', self.nr_postpone, '/5000')
             self.nr_postpone = 0
 
-        if self.output[action] != 'Postpone':                
+        if self.output[action] != 'Postpone':
             token_id = None
             tokens_pending = {k: v for k, v in self.simulation_process.tokens_pending.items() if v[0]._next_activity == self.output[action][1]}
             if len(tokens_pending) > 1:
                 # token_id = random.choice([token for token in tokens_pending.keys()])
-                # print(token_id)
+                #print(x[1][1] for x in tokens_pending.items())
                 token_id = max(tokens_pending.items(), key=lambda x: x[1][1])[0]
+                #print(token_id)
             else:
                 token_id = list(tokens_pending.keys())[0]
             simulation = self.tokens[token_id].simulation({'task': self.output[action][1],
@@ -204,12 +207,14 @@ class gym_env(Env):
         # Gather rewards
         for trace_id, cycle_time in self.simulation_process.traces['ended']:
             if trace_id not in self.completed_traces:
+                #reward -= cycle_time/self.normalization_cycle_time
                 reward += 1 / (1 + (cycle_time/self.normalization_cycle_time))
 
         if len(self.tokens) == 0:
             isTerminated = True
             self.mean_cycle_time = np.mean([cycle_time for (trace_id, cycle_time) in self.simulation_process.traces['ended']])
             self.total_reward = sum([1 / (1 + (cycle_time/self.normalization_cycle_time)) for (trace_id, cycle_time) in self.simulation_process.traces['ended']])
+            #self.total_reward = sum([(-cycle_time/self.normalization_cycle_time) for (trace_id, cycle_time) in self.simulation_process.traces['ended']])
             print('Mean cycle time:', self.mean_cycle_time, flush=True)
             print('Total reward:', self.total_reward, flush=True)
         else:
@@ -235,7 +240,7 @@ class gym_env(Env):
             print('Mean cycle time:', np.mean([cycle_time for (trace_id, cycle_time) in self.simulation_process.traces['ended']]))
             print([(cycle_time) for (trace_id, cycle_time) in self.simulation_process.traces['ended']])
         else:
-            isTerminated = False       
+            isTerminated = False
         return self.get_state(), reward, isTerminated, {}, {}
 
 
@@ -313,13 +318,13 @@ class gym_env(Env):
         # for each activity: it counts how many tokens_pending are waiting the resource with that activity
         # It counts until 10 and normalize by 10
         if len(self.simulation_process.tokens_pending) > 0:
-            task_types_num = [min(1.0, sum([1 if self.simulation_process.tokens_pending[token][0]._next_activity == task_type else 0 for token in self.simulation_process.tokens_pending])/10) for task_type in self.task_types]
+            task_types_num = [min(1.0, sum([1 if self.simulation_process.tokens_pending[token][0]._next_activity == task_type else 0 for token in self.simulation_process.tokens_pending])/100) for task_type in self.task_types]
         else:
             task_types_num = [0.0 for _ in range(len(self.task_types))]
         #wip = [(len(env_state['traces']['ongoing'])+1)/1000]
 
-        #time = [env_state['time'].weekday()/6, (env_state['time'].hour*3600 + env_state['time'].minute*60 + env_state['time'].second)/(24*3600)]
-        return np.array(resource_available + resource_assigned_to + task_types_num)# + time
+        time = [env_state['time'].weekday()/6, (env_state['time'].hour*3600 + env_state['time'].minute*60 + env_state['time'].second)/(24*3600)]
+        return np.array(resource_available + resource_assigned_to + task_types_num + time)
 
     # Create an action mask which invalidates ineligible actions
     def action_masks(self) -> List[bool]:
@@ -331,8 +336,7 @@ class gym_env(Env):
                 if state[self.input.index(resource + '_availability')] > 0 and state[self.input.index(task_type)] > 0:
                     if (resource, task_type) in self.output:
                         mask[self.output.index((resource, task_type))] = 1
-        
-        #if len(self.simulation_process.tokens_pending) == 0 and all([state[self.input.index(resource + '_availability')] > 0 for resource in self.resources]):
+
         if len(self.simulation_process.tokens_pending) == (self.N_TRACES-len(state_simulator['traces']['ended'])) and all([state[self.input.index(resource + '_availability')] > 0 for resource in self.resources]):
             mask[-1] = 0 # All tokens have arrived and all resources available. State will not change so we mask postpone
         else:

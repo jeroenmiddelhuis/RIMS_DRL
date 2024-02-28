@@ -41,11 +41,13 @@ if len(sys.argv) > 1:
         normalization = True if sys.argv[4] == "True" else False
     else:
         normalization = True
+    threshold = int(sys.argv[5])
 else:
     NAME_LOG = 'PurchasingExample'
-    N_TRACES = 100#'from_input_data'
+    N_TRACES = 'from_input_data'
     CALENDAR = True
     normalization = True
+    threshold = 0
 
 #### to use BPI_Challenge_2017_W_Two_TS first download the entire log from 'https://drive.google.com/file/d/1juGeinUqaxkLBEmObIBYiRA3NqAMOcoN/view?usp=drive_link' and place it in the folder of the same name inside example
 
@@ -53,25 +55,25 @@ if __name__ == '__main__':
     #if true, load model for a new round of training
     load_model = False
     postpone_penalty = 0
-    time_steps = 1280000
-    n_steps = 1000# Number of steps for each network update
+    time_steps = 10240000
+    n_steps = 6400# Number of steps for each network update
     # if NAME_LOG == 'BPI_Challenge_2017_W_Two_TS':
     #     n_steps = 38400
     # Create log dir
     now = datetime.datetime.now()
     #log_dir = f"./tmp/{NAME_LOG}_{now.year}_{now.month}_{now.day}_{now.hour}_{now.minute}/"  # Logging training results
-    log_dir = f"tmp/{NAME_LOG}_{N_TRACES}_{CALENDAR}/"
+    log_dir = f"tmp/{NAME_LOG}_{N_TRACES}_{CALENDAR}_{threshold}/"
     os.makedirs(log_dir, exist_ok=True)
 
     #print(f'Training agent for {config_type} with {time_steps} timesteps in updates of {n_steps} steps.')
     # Create and wrap the environment
     # Reward functions: 'AUC', 'case_task'
-    env_simulator = gym_env(NAME_LOG, N_TRACES, CALENDAR, normalization=normalization)  # Initialize env
+    env_simulator = gym_env(NAME_LOG, N_TRACES, CALENDAR, normalization=normalization, threshold=threshold)  # Initialize env
 
     env = Monitor(env_simulator, log_dir)
 
     # Create the model
-    model = MaskablePPO(CustomPolicy, env_simulator, clip_range=0.2, learning_rate=3e-4, n_steps=int(n_steps), batch_size=256, gamma=0.999, verbose=1)
+    model = MaskablePPO(CustomPolicy, env_simulator, clip_range=0.2, learning_rate=linear_schedule(3e-4), n_steps=int(n_steps), batch_size=256, gamma=1, verbose=1)
 
     #Logging to tensorboard. To access tensorboard, open a bash terminal in the projects directory, activate the environment (where tensorflow should be installed) and run the command in the following line
     # tensorboard --logdir ./tmp/
@@ -86,12 +88,12 @@ if __name__ == '__main__':
     #     save_vecnormalize=True,
     # )
     # Train the agent
-    eval_env = gym_env(NAME_LOG, N_TRACES, CALENDAR, normalization=normalization)  # Initialize env
+    eval_env = gym_env(NAME_LOG, N_TRACES, CALENDAR, normalization=normalization, threshold=threshold)  # Initialize env
     eval_env = Monitor(eval_env, log_dir)
-    eval_callback = EvalPolicyCallback(check_freq=1*int(n_steps), nr_evaluations=1, log_dir=log_dir, eval_env=eval_env)
+    eval_callback = EvalPolicyCallback(check_freq=5*int(n_steps), nr_evaluations=5, log_dir=log_dir, eval_env=eval_env)
 
     callback = SaveOnBestTrainingRewardCallback(check_freq=1000, log_dir=log_dir)
-    model.learn(total_timesteps=int(time_steps), callback=eval_callback)
+    model.learn(total_timesteps=int(time_steps))#, callback=eval_callback
 
     model.save(f'{log_dir}/model_final')
 
