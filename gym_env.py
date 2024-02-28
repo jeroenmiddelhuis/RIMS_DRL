@@ -137,9 +137,8 @@ class gym_env(Env):
             prev = itime
             parallel_object = utility.ParallelObject()
             time_trace = self.env.now
-            _print = True if writer != None else False
             token = Token(i, net, im, self.params, self.simulation_process, prefix, 'sequential', writer, parallel_object,
-                          itime, self.env, self.CALENDAR, None, _print=_print)
+                          itime, self.env, self.CALENDAR, None, _print=self.print)
             self.tokens[i] = token
             self.env.process(token.inter_trigger_time(itime))
 
