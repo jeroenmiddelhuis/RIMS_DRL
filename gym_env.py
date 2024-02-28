@@ -39,7 +39,7 @@ class gym_env(Env):
         self.normalization_cycle_time = self.normalization_cycle_times[self.name_log] if normalization else 0
         #self.median_processing_time = retrieve_median_processing_time(NAME_LOG)
         self.policy = POLICY
-        self.print = True
+        self.print = False
         if threshold > 0:
             input_file = './example/' + self.name_log + '/input_' + self.name_log + str(threshold) + '.json'
         else:
@@ -172,7 +172,8 @@ class gym_env(Env):
             if len(tokens_pending) > 1:
                 # token_id = random.choice([token for token in tokens_pending.keys()])
                 # print(token_id)
-                token_id = max(tokens_pending.items(), key=lambda x: x[1][1])[0]
+                token_id = min(list(tokens_pending.keys()))
+                #token_id = max(tokens_pending.items(), key=lambda x: x[1][1])[0]
             else:
                 token_id = list(tokens_pending.keys())[0]
             simulation = self.tokens[token_id].simulation({'task': self.output[action][1],
@@ -333,9 +334,9 @@ class gym_env(Env):
                         mask[self.output.index((resource, task_type))] = 1
         
         #if len(self.simulation_process.tokens_pending) == 0 and all([state[self.input.index(resource + '_availability')] > 0 for resource in self.resources]):
-        if len(self.simulation_process.tokens_pending) == (self.N_TRACES-len(state_simulator['traces']['ended'])) and all([state[self.input.index(resource + '_availability')] > 0 for resource in self.resources]):
-            mask[-1] = 0 # All tokens have arrived and all resources available. State will not change so we mask postpone
-        else:
-            mask[-1] = 1 # Postpone available
+        #if len(self.simulation_process.tokens_pending) == (self.N_TRACES-len(state_simulator['traces']['ended'])) and all([state[self.input.index(resource + '_availability')] > 0 for resource in self.resources]):
+        #    mask[-1] = 0 # All tokens have arrived and all resources available. State will not change so we mask postpone
+        #else:
+        mask[-1] = 0 # Mask postpone
         return list(map(bool, mask))
 

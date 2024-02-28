@@ -42,8 +42,8 @@ if len(sys.argv) > 1:
     else:
         normalization = True
 else:
-    NAME_LOG = 'PurchasingExample'
-    N_TRACES = 100#'from_input_data'
+    NAME_LOG = 'ConsultaDataMining201618'
+    N_TRACES = 2000#'from_input_data'
     CALENDAR = True
     normalization = True
 
@@ -66,7 +66,7 @@ if __name__ == '__main__':
     #print(f'Training agent for {config_type} with {time_steps} timesteps in updates of {n_steps} steps.')
     # Create and wrap the environment
     # Reward functions: 'AUC', 'case_task'
-    env_simulator = gym_env(NAME_LOG, N_TRACES, CALENDAR, normalization=normalization)  # Initialize env
+    env_simulator = gym_env(NAME_LOG, N_TRACES, CALENDAR, normalization=normalization, threshold=20)  # Initialize env
 
     env = Monitor(env_simulator, log_dir)
 
