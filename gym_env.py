@@ -323,8 +323,8 @@ class gym_env(Env):
             task_types_num = [0.0 for _ in range(len(self.task_types))]
         #wip = [(len(env_state['traces']['ongoing'])+1)/1000]
 
-        time = [env_state['time'].weekday()/6, (env_state['time'].hour*3600 + env_state['time'].minute*60 + env_state['time'].second)/(24*3600)]
-        return np.array(resource_available + resource_assigned_to + task_types_num + time)
+        #time = [env_state['time'].weekday()/6, (env_state['time'].hour*3600 + env_state['time'].minute*60 + env_state['time'].second)/(24*3600)]
+        return np.array(resource_available + resource_assigned_to + task_types_num)# + time)
 
     # Create an action mask which invalidates ineligible actions
     def action_masks(self) -> List[bool]:
