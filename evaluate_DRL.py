@@ -141,29 +141,31 @@ def confidence_interval(data):
     return ci_lower, ci_upper
 
 
-def evaluate(NAME, POLICY, data, log, calendar, threshold):
+def evaluate(NAME, POLICY, data, calendar, threshold):
     #"output/output_{}_{}_{}/simulated_log_{}_{}_{}".format(self.name_log, calendar, self.threshold, self.name_log, self.policy, str(i)) + ".csv", 'w'
-    path = f'output_no_postpone/output_{NAME}_{calendar}_{threshold}/simulated_log_{NAME}_{POLICY}'# + '*.csv'
+    path = f'output/output_{NAME}_{calendar}_{threshold}/simulated_log_{NAME}_{POLICY}'# + '*.csv'
     #path = 'output/output_' + NAME + '/ENTIRE_LOG_CALENDAR/'+POLICY+'/simulated_log_' + NAME + '_' + POLICY + '*.csv'
     #all_file = glob.glob(path)
-    all_file = [path + '_' + str(i) + '.csv' for i in range(25)]
+    all_file = [path + '_' + str(i) + '.csv' for i in range(2, 3)]
     cycle_time = []
     for file in all_file:
         simulated_log = pd.read_csv(file)
-        simulated_log['start_time'] = pd.to_datetime(simulated_log['start_time'], format="%Y-%m-%d %H:%M:%S")
-        simulated_log['end_time'] = pd.to_datetime(simulated_log['start_time'], format="%Y-%m-%d %H:%M:%S")
+        # simulated_log['start_time'] = pd.to_datetime(simulated_log['start_time'], format="%Y-%m-%d %H:%M:%S")
+        # simulated_log['end_time'] = pd.to_datetime(simulated_log['start_time'], format="%Y-%m-%d %H:%M:%S")
         simulated_log = pm4py.format_dataframe(simulated_log, case_id='id_case', activity_key='activity',
                                                timestamp_key='end_time', start_timestamp_key='start_time')
         simulated_log = pm4py.convert_to_event_log(simulated_log)
         simulated_log = sorting.sort_timestamp_log(simulated_log)
         for trace in simulated_log:
             cycle_time.append((trace[-1]['end_time'] - trace[0]['start_time']).total_seconds())
+    #print('evaluate',cycle_time)
     ci_lower, ci_upper = confidence_interval(cycle_time)
     data[POLICY] = {'values': cycle_time, 'mean': [np.mean(cycle_time), ci_lower, ci_upper]}
 
 
 def run_simulation(NAME_LOG, POLICY, N_SIMULATION, model=None, median_processing_time=None):
-    env_simulator = gym_env(NAME_LOG, N_TRACES, CALENDAR, threshold=THRESHOLD)
+    env_simulator = gym_env(NAME_LOG, N_TRACES, CALENDAR, POLICY=POLICY, threshold=THRESHOLD)
+    cycle_times = {}
     for i in range(0, N_SIMULATION):
         obs = env_simulator.reset(i=i)
         isTerminated = False
@@ -186,58 +188,68 @@ def run_simulation(NAME_LOG, POLICY, N_SIMULATION, model=None, median_processing
                 mask = env_simulator.action_masks()
                 action, _states = model.predict(state, action_masks=mask)
                 state, reward, isTerminated, dones, info = env_simulator.step(action)
-        print('END simulation')
+                cycle_times[f'simulation_{i}'] = env_simulator.cycle_times
+        
+    # with open(f'output/output_{NAME_LOG}_{CALENDAR}_{THRESHOLD}/results_'+NAME_LOG+'.json', 'w') as f:
+    #     json.dump(data, f)
+    print('END simulation')
 
 
 ### Path DRL model
-
+traces = {"BPI_Challenge_2012_W_Two_TS":1200,
+        "confidential_1000":159,
+        "ConsultaDataMining201618":181,
+        "PurchasingExample":101,
+        "BPI_Challenge_2017_W_Two_TS":5789,
+        "Productions":45}
 if len(sys.argv) > 1:    
     NAME_LOG = sys.argv[1]#'BPI_Challenge_2017_W_Two_TS'
     if not sys.argv[2] == 'from_input_data':    
         N_TRACES = int(sys.argv[2])#2000
     else:
         N_TRACES = sys.argv[2]
-        traces = {"BPI_Challenge_2012_W_Two_TS":1200,
-                "confidential_1000":159,
-                "ConsultaDataMining201618":181,
-                "PurchasingExample":101,
-                "BPI_Challenge_2017_W_Two_TS":5789,
-                "Productions":45}
     CALENDAR = True if sys.argv[3] == "True" else False
     model = MaskablePPO.load(os.getcwd() + "/tmp_training_phase_1/" + f"{NAME_LOG}_{traces[NAME_LOG]}_{CALENDAR}" + "/final_model.zip")
     THRESHOLD = int(sys.argv[4])
-    N_SIMULATION = 5
+    N_SIMULATION = 1
     POLICY = 'None'
 else:
     model = None
-    NAME_LOG = 'BPI_Challenge_2012_W_Two_TS'#'BPI_Challenge_2017_W_Two_TS', 'confidential_1000', 'ConsultaDataMining201618','PurchasingExample'
-    N_TRACES = 1000
+    NAME_LOG = 'Productions'#'BPI_Challenge_2017_W_Two_TS', 'confidential_1000', 'ConsultaDataMining201618','PurchasingExample'
+    N_TRACES = 'from_input_data'
     CALENDAR = True
-    POLICY = 'None'
-    N_SIMULATION = 25
+    THRESHOLD = 0
+    POLICY = 'FIFO_case'
+    N_SIMULATION = 1
 
 
 data = {'FIFO_activity': {}, 'FIFO_case': {}, 'RANDOM': {}, 'SPT': {}, 'None': {}}
-## i number of simulations for log
-# for POLICY in ['FIFO_case', 'RANDOM', 'SPT']:
-#     if POLICY == 'SPT':
-#         median_processing_time = retrieve_median_processing_time(NAME_LOG)
-#         run_simulation(NAME_LOG, POLICY, N_SIMULATION, median_processing_time=median_processing_time)
-#     elif POLICY == 'FIFO_activity' or POLICY == 'FIFO_case' or POLICY == 'RANDOM':
-#         run_simulation(NAME_LOG, POLICY, N_SIMULATION)
-#     else:
-#         pass
-#         #run_simulation(NAME_LOG, POLICY, N_SIMULATION, model=model)
-#     evaluate(NAME_LOG, POLICY, data)
+evaluate(NAME_LOG, POLICY, data, calendar='CALENDAR', threshold=THRESHOLD)
 
-for log in ['BPI_Challenge_2017_W_Two_TS']:#['BPI_Challenge_2017_W_Two_TS', 'ConsultaDataMining201618', 'BPI_Challenge_2012_W_Two_TS', 'PurchasingExample', 'confidential_1000','Productions']:
-    for calendar in ['CALENDAR', 'NOT_CALENDAR']:
-        for threshold in ['0', '20']:
-            print(log, calendar, threshold)
-            data = {'None': {}}
-            evaluate(log, POLICY, data, log, calendar, threshold)
-            with open(f'output_no_postpone/output_{NAME_LOG}_{calendar}_{threshold}/results_'+NAME_LOG+'.json', 'w') as f:
-                json.dump(data, f)
+
+# i number of simulations for log
+# for NAME_LOG in ['ConsultaDataMining201618']:#'BPI_Challenge_2012_W_Two_TS', 'confidential_1000', 'Productions','PurchasingExample', , 'BPI_Challenge_2017_W_Two_TS'
+#     for POLICY in ['FIFO_case', 'RANDOM', 'SPT']:
+#         print(POLICY, NAME_LOG)
+#         if POLICY == 'SPT':
+#             median_processing_time = retrieve_median_processing_time(NAME_LOG)
+#             run_simulation(NAME_LOG, POLICY, N_SIMULATION, THRESHOLD, median_processing_time=median_processing_time)
+#         elif POLICY == 'FIFO_activity' or POLICY == 'FIFO_case' or POLICY == 'RANDOM':
+#             run_simulation(NAME_LOG, POLICY, N_SIMULATION, THRESHOLD)
+#         else:
+#             pass
+#             #run_simulation(NAME_LOG, POLICY, N_SIMULATION, model=model)
+        
+        
+
+# for log in ['ConsultaDataMining201618']:#['BPI_Challenge_2017_W_Two_TS', 'ConsultaDataMining201618', 'BPI_Challenge_2012_W_Two_TS', 'PurchasingExample', 'confidential_1000','Productions']:
+#     for calendar in ['CALENDAR', 'NOT_CALENDAR']:
+#         for threshold in ['0', '20']:
+#             print(log, calendar, threshold)
+#             data = {'None': {}}
+#             evaluate(log, POLICY, data, log, calendar, threshold)
+#             with open(f'output_no_postpone/output_{NAME_LOG}_{calendar}_{threshold}/results_'+NAME_LOG+'.json', 'w') as f:
+#                 json.dump(data, f)
 
 #for POLICY in ['FIFO_activity', 'FIFO_case', 'RANDOM', 'SPT']:
 #    evaluate('BPI_Challenge_2012_W_Two_TS', POLICY, data)

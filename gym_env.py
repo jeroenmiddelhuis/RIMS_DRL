@@ -28,15 +28,17 @@ if __name__ == "__main__":
 
 
 class gym_env(Env):
-    def __init__(self, NAME_LOG, N_TRACES, CALENDAR, normalization=True, POLICY=None, N_SIMULATION=0, threshold=0) -> None:
+    def __init__(self, NAME_LOG, N_TRACES, CALENDAR, POLICY=None, N_SIMULATION=0, threshold=0, postpone=True, reward_function='inverse_CT') -> None:
         self.name_log = NAME_LOG
+
+        self.CALENDAR = CALENDAR ## "True" If you want to use calendar, "False" otherwise
         self.threshold = threshold
-        self.normalization_cycle_times = {"BPI_Challenge_2012_W_Two_TS":10000,
-                                          "confidential_1000":10000,
-                                          "ConsultaDataMining201618":10000,
-                                          "PurchasingExample":10000,
-                                          "BPI_Challenge_2017_W_Two_TS":10000,
-                                          "Productions":10000}
+        self.postpone = postpone
+        self.reward_function = reward_function # 'inverse_CT' or 'negative_CT'
+
+        self.total_reward = 0
+        self.reward_count = 0
+
         self.normalization_cycle_time = 10000#= self.normalization_cycle_times[self.name_log] if normalization else 0
         #self.median_processing_time = retrieve_median_processing_time(NAME_LOG)
         self.policy = POLICY
@@ -49,6 +51,11 @@ class gym_env(Env):
             input_data = json.load(f)
         self.n_simulation = N_SIMULATION
 
+        if N_TRACES == 'from_input_data':
+            self.N_TRACES = input_data['traces']
+        else:
+            self.N_TRACES = N_TRACES
+
         self.resources = sorted(list(input_data["resource"].keys()))
         self.task_types = sorted(list(input_data["processing_time"].keys()))
 
@@ -56,9 +63,9 @@ class gym_env(Env):
         # The inputs are: 1) resource availability, 2) if a resource is busy, to what task_type, 3) number of tasks for each activity
         self.input = [resource + '_availability' for resource in self.resources] + \
                      [resource + '_to_task_type' for resource in self.resources] + \
-                     [task_type for task_type in self.task_types] + \
-                     ['day', 'hour']
-
+                     [task_type for task_type in self.task_types] 
+        if self.CALENDAR == True:
+            self.input += ['day', 'hour']
         # The outputs are: the assignments (resource, task_type)
         #self.output = [(resource, task_type) for task_type in self.task_types for resource in self.resources] + ['Postpone']
 
@@ -71,16 +78,12 @@ class gym_env(Env):
             self.FEATURE_ROLE = None
         self.PATH_PETRINET = './example/' + self.name_log + '/' + self.name_log + '.pnml'
         PATH_PARAMETERS = input_file
-        if N_TRACES == 'from_input_data':
-            self.N_TRACES = input_data['traces']
-        else:
-            self.N_TRACES = N_TRACES
-        self.CALENDAR = CALENDAR ## "True" If you want to use calendar, "False" otherwise
+
+        
         self.PATH_LOG = './example/' + self.name_log + '/' + self.name_log + '.xes'
         self.params = Parameters(PATH_PARAMETERS, self.N_TRACES, self.name_log, self.FEATURE_ROLE, threshold)
         ### define possible assignments from log
         self.output = self.retrieve_possible_assignments(self.params.RESOURCE_TO_ROLE_LSTM)
-        #self.output.remove('Postpone')
 
         # Observation space
         lows = np.array([0 for _ in range(len(self.input))])
@@ -98,6 +101,8 @@ class gym_env(Env):
         self.nr_steps = 0
         self.nr_postpone = 0
 
+        print(f'{self.name_log}, {self.N_TRACES}, calendar={self.CALENDAR}, postpone={self.postpone}, reward={self.reward_function}', flush=True)
+        print('Last action', self.output[-1], flush=True)
         warnings.filterwarnings("ignore")
 
 
@@ -110,10 +115,15 @@ class gym_env(Env):
         for index, row in log.iterrows():
             if row['org:resource'] in resources.keys():
                 possible_assignment.add((row['org:resource'], row['concept:name']))
-        return list(possible_assignment) + ['Postpone']
+        if self.postpone: # Add postpone action        
+            return list(possible_assignment) + ['Postpone']
+        elif not self.postpone:
+            return list(possible_assignment)
 
     def reset(self, seed=0, i=None):
         print('-------- Resetting environment --------')
+        self.total_reward = 0
+        self.reward_count = 0
         self.env = simpy.Environment()
         self.simulation_process = SimulationProcess(self.env, self.params, self.CALENDAR)
         self.completed_traces = []
@@ -157,14 +167,14 @@ class gym_env(Env):
         if self.output[action] == 'Postpone':
             self.nr_postpone += 1
         self.nr_steps += 1
-        if self.nr_steps % 5000 == 0:
+        if self.nr_steps % 20000 == 0:
             #env_state = self.simulation_process.get_state()
-            print('Steps:', self.nr_steps)
+            print('Steps:', self.nr_steps, flush=True)
             state_print = self.get_state()
-            print(state_print)
+            print(state_print, flush=True)
             #print('State', [(k, state_print[i]) for i, k in enumerate(self.input)])
             #print('week/day', [env_state['time'].weekday(), env_state['time']])
-            print('Postpone actions:', self.nr_postpone, '/5000')
+            print('Postpone actions:', self.nr_postpone, '/20000', flush=True)
             self.nr_postpone = 0
 
         if self.output[action] != 'Postpone':
@@ -206,16 +216,28 @@ class gym_env(Env):
         # Gather rewards
         for trace_id, cycle_time in self.simulation_process.traces['ended']:
             if trace_id not in self.completed_traces:
-                #reward -= cycle_time/self.normalization_cycle_time
-                reward += 1 / (1 + (cycle_time/self.normalization_cycle_time))
+                self.completed_traces.append(trace_id)
+                if self.reward_function == 'negative_CT':
+                    reward -= cycle_time/self.normalization_cycle_time                
+                elif self.reward_function == 'inverse_CT':
+                    reward += 1 / (1 + (cycle_time/self.normalization_cycle_time))
+                self.reward_count += 1
+                
+        self.total_reward += reward        
 
         if len(self.tokens) == 0:
             isTerminated = True
             self.mean_cycle_time = np.mean([cycle_time for (trace_id, cycle_time) in self.simulation_process.traces['ended']])
-            self.total_reward = sum([1 / (1 + (cycle_time/self.normalization_cycle_time)) for (trace_id, cycle_time) in self.simulation_process.traces['ended']])
-            #self.total_reward = sum([(-cycle_time/self.normalization_cycle_time) for (trace_id, cycle_time) in self.simulation_process.traces['ended']])
+            if self.reward_function == 'inverse_CT': 
+                self.total_reward_end = sum([1 / (1 + (cycle_time/self.normalization_cycle_time)) for (trace_id, cycle_time) in self.simulation_process.traces['ended']])
+            elif self.reward_function == 'negative_CT':
+                self.total_reward_end = sum([(-cycle_time/self.normalization_cycle_time) for (trace_id, cycle_time) in self.simulation_process.traces['ended']])
             print('Mean cycle time:', self.mean_cycle_time, flush=True)
-            print('Total reward:', self.total_reward, flush=True)
+            print('Total reward sum final calc:', self.total_reward_end, flush=True)
+            print('Total reward cumulative:', self.total_reward, flush=True)
+            print('Mean reward per traces', self.total_reward/len(self.completed_traces), flush=True)
+            print('Number of completed traces', len(self.completed_traces), flush=True)
+            print('Nonzero reward count', self.reward_count, flush=True)
         else:
             isTerminated = False
         return self.get_state(), reward, isTerminated, {}, {}
@@ -232,12 +254,13 @@ class gym_env(Env):
             if trace_id not in self.completed_traces:
                 self.completed_traces.append(trace_id)
                 reward += 1 / (1 + (cycle_time / self.normalization_cycle_time))
-
         if len(self.tokens) == 0:
             isTerminated = True
             print(self.env.now)
             print('Mean cycle time:', np.mean([cycle_time for (trace_id, cycle_time) in self.simulation_process.traces['ended']]))
-            print([(cycle_time) for (trace_id, cycle_time) in self.simulation_process.traces['ended']])
+            self.cycle_times = [cycle_time for (trace_id, cycle_time) in self.simulation_process.traces['ended']]
+            #print('gym_env',[cycle_time for (trace_id, cycle_time) in self.simulation_process.traces['ended']])
+            #print([(cycle_time) for (trace_id, cycle_time) in self.simulation_process.traces['ended']])
         else:
             isTerminated = False
         return self.get_state(), reward, isTerminated, {}, {}
@@ -321,9 +344,11 @@ class gym_env(Env):
         else:
             task_types_num = [0.0 for _ in range(len(self.task_types))]
         #wip = [(len(env_state['traces']['ongoing'])+1)/1000]
-
-        #time = [env_state['time'].weekday()/6, (env_state['time'].hour*3600 + env_state['time'].minute*60 + env_state['time'].second)/(24*3600)]
-        return np.array(resource_available + resource_assigned_to + task_types_num)# + time)
+        if self.CALENDAR:
+            time = [env_state['time'].weekday()/6, (env_state['time'].hour*3600 + env_state['time'].minute*60 + env_state['time'].second)/(24*3600)]
+            return np.array(resource_available + resource_assigned_to + task_types_num + time)
+        else:
+            return np.array(resource_available + resource_assigned_to + task_types_num)
 
     # Create an action mask which invalidates ineligible actions
     def action_masks(self) -> List[bool]:
@@ -335,10 +360,10 @@ class gym_env(Env):
                 if state[self.input.index(resource + '_availability')] > 0 and state[self.input.index(task_type)] > 0:
                     if (resource, task_type) in self.output:
                         mask[self.output.index((resource, task_type))] = 1
-
-        if len(self.simulation_process.tokens_pending) == (self.N_TRACES-len(state_simulator['traces']['ended'])) and all([state[self.input.index(resource + '_availability')] > 0 for resource in self.resources]):
-            mask[-1] = 0 # All tokens have arrived and all resources available. State will not change so we mask postpone
-        else:
-            mask[-1] = 1 # Postpone available
+        if self.postpone:
+            if len(self.simulation_process.tokens_pending) == (self.N_TRACES-len(state_simulator['traces']['ended'])) and all([state[self.input.index(resource + '_availability')] > 0 for resource in self.resources]):
+                mask[-1] = 0 # All tokens have arrived and all resources available. State will not change so we mask postpone
+            else:
+                mask[-1] = 1 # Postpone available
         return list(map(bool, mask))
 
