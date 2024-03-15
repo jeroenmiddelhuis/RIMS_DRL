@@ -1,8 +1,6 @@
-tmp/
+tmp*
 __pycache__/
 baseline/__pycache__/
-output/
-output_no_postpone/
-output_postpone/
-test.py
+output*
+test_LSTM.py
 example/BPI_Challenge_2017_W_Two_TS/BPI_Challenge_2017_W_Two_TS.xes

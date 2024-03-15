@@ -84,7 +84,7 @@ class gym_env(Env):
         self.params = Parameters(PATH_PARAMETERS, self.N_TRACES, self.name_log, self.FEATURE_ROLE, threshold)
         ### define possible assignments from log
         self.output = self.retrieve_possible_assignments(self.params.RESOURCE_TO_ROLE_LSTM)
-
+        print(len(self.input), len(self.output))
         # Observation space
         lows = np.array([0 for _ in range(len(self.input))])
         highs = np.array([1 for _ in range(len(self.input))])
@@ -102,7 +102,6 @@ class gym_env(Env):
         self.nr_postpone = 0
 
         print(f'{self.name_log}, {self.N_TRACES}, calendar={self.CALENDAR}, postpone={self.postpone}, reward={self.reward_function}', flush=True)
-        print('Last action', self.output[-1], flush=True)
         warnings.filterwarnings("ignore")
 
 
@@ -115,10 +114,11 @@ class gym_env(Env):
         for index, row in log.iterrows():
             if row['org:resource'] in resources.keys():
                 possible_assignment.add((row['org:resource'], row['concept:name']))
+        possible_assignment = sorted(list(possible_assignment))
         if self.postpone: # Add postpone action        
-            return list(possible_assignment) + ['Postpone']
+            return possible_assignment + ['Postpone']
         elif not self.postpone:
-            return list(possible_assignment)
+            return possible_assignment
 
     def reset(self, seed=0, i=None):
         print('-------- Resetting environment --------')
@@ -128,11 +128,15 @@ class gym_env(Env):
         self.simulation_process = SimulationProcess(self.env, self.params, self.CALENDAR)
         self.completed_traces = []
         #if i != None:
+
         if self.print:
             calendar = 'CALENDAR' if self.CALENDAR else 'NOT_CALENDAR'
-            utility.define_folder_output("output/output_{}_{}_{}".format(self.name_log, calendar, self.threshold))            
-            f = open("output/output_{}_{}_{}/simulated_log_{}_{}_{}".format(self.name_log, calendar, self.threshold, self.name_log, self.policy, str(i)) + ".csv", 'w')
-            print("output/output_{}_{}_{}/simulated_log_{}_{}_{}".format(self.name_log, calendar, self.threshold, self.name_log, self.policy, str(i)) + ".csv")
+            # utility.define_folder_output(f"output/output_{self.name_log}_C{self.CALENDAR}_T{self.threshold}_P{self.postpone}_{self.policy}")            
+            # f = open(f"output/output_{self.name_log}_C{self.CALENDAR}_T{self.threshold}_P{self.postpone}_{self.policy}/simulated_log_{self.name_log}_{self.policy}_{str(i)}.csv", 'w')
+            # print(f"output/output_{self.name_log}_C{self.CALENDAR}_T{self.threshold}_P{self.postpone}_{self.policy}/simulated_log_{self.name_log}_{self.policy}_{str(i)}.csv")
+            utility.define_folder_output(f"output/output_{self.name_log}_C{self.CALENDAR}_T{self.threshold}_{self.policy}")            
+            f = open(f"output/output_{self.name_log}_C{self.CALENDAR}_T{self.threshold}_{self.policy}/simulated_log_{self.name_log}_{self.policy}_{str(i)}.csv", 'w')
+            print(f"output/output_{self.name_log}_C{self.CALENDAR}_T{self.threshold}_{self.policy}/simulated_log_{self.name_log}_{self.policy}_{str(i)}.csv")
             writer = csv.writer(f)
             writer.writerow(Buffer(writer).get_buffer_keys())
         else:
@@ -170,8 +174,8 @@ class gym_env(Env):
         if self.nr_steps % 20000 == 0:
             #env_state = self.simulation_process.get_state()
             print('Steps:', self.nr_steps, flush=True)
-            state_print = self.get_state()
-            print(state_print, flush=True)
+            #state_print = self.get_state()
+            #print(state_print, flush=True)
             #print('State', [(k, state_print[i]) for i, k in enumerate(self.input)])
             #print('week/day', [env_state['time'].weekday(), env_state['time']])
             print('Postpone actions:', self.nr_postpone, '/20000', flush=True)
@@ -181,14 +185,15 @@ class gym_env(Env):
             token_id = None
             tokens_pending = {k: v for k, v in self.simulation_process.tokens_pending.items() if v[0]._next_activity == self.output[action][1]}
             if len(tokens_pending) > 1:
-                # token_id = random.choice([token for token in tokens_pending.keys()])
+                #print(tokens_pending)
+                token_id = min(tokens_pending.keys()) # FIFO_case
                 #print(x[1][1] for x in tokens_pending.items())
-                token_id = max(tokens_pending.items(), key=lambda x: x[1][1])[0]
+                # token_id = max(tokens_pending.items(), key=lambda x: x[1][1])[0] #FIFO_activity
                 #print(token_id)
             else:
                 token_id = list(tokens_pending.keys())[0]
             simulation = self.tokens[token_id].simulation({'task': self.output[action][1],
-                                                                     'resource': self.output[action][0]})
+                                                           'resource': self.output[action][0]})
             self.env.process(simulation)
             self.next_decision_moment(self.output[action]) #arg not used
         #elif self.check_exception_postpone(): ### exception case: all available resources and all tokens already arrived
@@ -227,13 +232,14 @@ class gym_env(Env):
 
         if len(self.tokens) == 0:
             isTerminated = True
+            self.cycle_times = [cycle_time for (trace_id, cycle_time) in self.simulation_process.traces['ended']]
             self.mean_cycle_time = np.mean([cycle_time for (trace_id, cycle_time) in self.simulation_process.traces['ended']])
             if self.reward_function == 'inverse_CT': 
                 self.total_reward_end = sum([1 / (1 + (cycle_time/self.normalization_cycle_time)) for (trace_id, cycle_time) in self.simulation_process.traces['ended']])
             elif self.reward_function == 'negative_CT':
                 self.total_reward_end = sum([(-cycle_time/self.normalization_cycle_time) for (trace_id, cycle_time) in self.simulation_process.traces['ended']])
             print('Mean cycle time:', self.mean_cycle_time, flush=True)
-            print('Total reward sum final calc:', self.total_reward_end, flush=True)
+            print('Total reward sum final calc (normalized):', self.total_reward_end, flush=True)
             print('Total reward cumulative:', self.total_reward, flush=True)
             print('Mean reward per traces', self.total_reward/len(self.completed_traces), flush=True)
             print('Number of completed traces', len(self.completed_traces), flush=True)
@@ -340,7 +346,7 @@ class gym_env(Env):
         # for each activity: it counts how many tokens_pending are waiting the resource with that activity
         # It counts until 10 and normalize by 10
         if len(self.simulation_process.tokens_pending) > 0:
-            task_types_num = [min(1.0, sum([1 if self.simulation_process.tokens_pending[token][0]._next_activity == task_type else 0 for token in self.simulation_process.tokens_pending])/100) for task_type in self.task_types]
+            task_types_num = [min(1.0, sum([1 if self.simulation_process.tokens_pending[token][0]._next_activity == task_type else 0 for token in self.simulation_process.tokens_pending])/10) for task_type in self.task_types]
         else:
             task_types_num = [0.0 for _ in range(len(self.task_types))]
         #wip = [(len(env_state['traces']['ongoing'])+1)/1000]
