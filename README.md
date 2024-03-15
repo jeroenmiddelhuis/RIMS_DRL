@@ -117,11 +117,5 @@ If the number of simulations to be run is more than one, RIMS_tool returns the s
 
 ## Authors
 
-https://drive.google.com/file/d/1G-4uIu88rIRhMS-8E6MMHrfYki1sGl41/view?usp=sharinghttps://drive.google.com/file/d/1G-4uIu88rIRhMS-8E6MMHrfYki1sGl41/view?usp=sharing
-
-Francesca Meneghello, Chiara Di Francescomarino, Chiara Ghidini
-
-Demo paper *RIMS_tool: a Hybrid Simulator for Business Processes*.
-
 
 #### link log BPI17 https://drive.google.com/file/d/1e6y4w8Phnf_D7KpAG5jRi1ZiPFDQ8zRz/view?usp=sharing
