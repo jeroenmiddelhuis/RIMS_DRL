@@ -1,28 +1,22 @@
-# ${RIMS}{\mathsf{_{Tool}}}$: Runtime Integration of Machine Learning and Simulation for Business Processes
+## Optimizing Resource Allocation Policies in Real-World Business Processes using Hybrid Process Simulation and Deep Reinforcement Learning
 
-Business Process Simulation represents a powerful instrument for business analysts when analyzing and comparing business processes. 
-Most of the state-of-the-art business process simulators, however, rely on Discrete event simulation, which requires various unrealistic assumptions and simplifications to perform experiments. 
-Predictive Process Monitoring, on the other hand, offers a viable way to complete ongoing traces or to generate entire traces from scratch, via predictions of the next activities and their attributes. Predictive models, though, are usually based on black-box approaches that makes it difficult to reason on what-if scenarios.
-RIMS_tool is a hybrid business process simulator that aims at combining predictive models built from data and Discrete event simulation at runtime in a white-box manner. The proposed tool, thus, is able to exploit the strengths and avoid the limitations of both approaches.
+Resource allocation refers to the assignment of resources to activities for their execution within a business process at runtime. While resource allocation approaches are common in industries such as manufacturing, directly applying them to business processes remains a challenge.
+Recently, techniques like Deep Reinforcement Learning (DRL) have been used to learn efficient resource allocation strategies to minimize the cycle time. While DRL has been proven to work well for simplified synthetic processes, its usefulness in real-world business processes remains untested, partly due to the challenging nature of realizing accurate simulation environments. To overcome this limitation, we propose DRL<sub>HSM</sub> that combines DRL with Hybrid simulation models (HSM). The HSM can accurately replicate the business process behavior so that we can assess the effectiveness of DRL in optimizing real-world business processes. 
 
-
-<img src="docs/images/rims_schema.png" alt="Alt Text" width="780">
-
-Here to see the full documentation, [RIMS_Tool documentation](https://francescameneghello.github.io/RIMS_tool/index.html)
-
-## Video 
-
-The demonstration video is in *docs/images/* folder or at the following link [video tutorial](https://francescameneghello.github.io/RIMS_tool/index.html#video-tutorial).
+In this repository, you will find the code to replicate the experiments in the paper "Optimizing Resource Allocation Policies in Real-World Business Processes using Hybrid Process Simulation and Deep Reinforcement Learning".
 
 ## Installation guide
 
-To execute this code, simply install the following main packages:
+To execute this code, install the following main packages in Python 3.10:
 
-* scikit-learn==1.2.1
-* scipy==1.11.2
+* sb3-contrib==2.2.1
+* tensorflow==2.15.0
 * simpy==4.0.1
 * pm4py==2.7.5.2
 * statsmodels==0.14.0
+* prophet==1.1.5
+* scikit-learn==1.2.1
+* scipy==1.11.2
 * pandas==1.5.3
 
 or you can use the configuration file called requirements.txt to install all specified package versions.
@@ -35,87 +29,23 @@ Otherwise, with the anaconda system you can create an environment using the envi
 specification provided in the repository.
 
 ```shell
-conda env create -f rims_tool.yml
-conda activate rims_tool
+conda env create -f environment.yml
+conda activate yourenvname
 ```
 
 
 ## Getting Started
 
-Once the packages are installed, <ins>inside the core folder</ins> you can run one or more simulations by specifying the following parameters:
+The main file for training the models is `train_DRL.py`. The following variables may be used to train a model for a log in the desired configuration:
 
-* `-p`: specify the path of the Petri net model to be simulated, in *pnml* format
-* `-s`: specify the path to the simulation parameter file, in *json* format
-* `-t`: specify the total number of traces per single simulation
-* `-i`: specify the total number of simulation to generate
-* `-o`: specify the path where to save the output files
+* `NAME_LOG`: the log for which a policy will be trained
+* `N_TRACES`: the number of traces in each episode. Setting this variable to `from_input_data` will use the number of traces as used in this paper
+* `CALENDAR`: a boolean to indicate if a calendar should be used
+* `threshold`: to reduce the number of resources, a threshold value of 20 can be used. To use all resources, the value should be set to 0
+* `postpone`: a boolean to indicate if the agent may use the postpone action. This variable was set to False in all experiments of this paper
+* `reward_function`: the reward function. Currently, only the reward function `inverse_CT`, as used in this paper, is supported
 
-```shell
-python run_simulation.py -p <petrinet>.pnml -s <simulation_parameters>.json -t 10 -i 1 -o <output_folder_name>
-```
-
-Otherwise, it is possible to run the three examples directly with the keywords: *arrivalsD*, *arrivalsS*, *process_times*, *decision_mining*
-```shell
-python run_simulation.py -e arrivalsD
-```
-
-
-## Input files
-
-As explained in the figure, the tool requires as input files at least: the Petri net model and the json file.
-
-##### Petri net model
-
-RIMS to model and simulate the process utilizes the Petri net model, which is handled through the methods provided by the pm4py library. 
-The input file for correct reading needs to be in the format [pnml](https://www.pnml.org/) i.e. *name_file.pnml*. Finally, it must not contain two or more transitions with the same name. 
-
-##### Simulation parameters
-
-As a second input file, the tool requires a json file in which the simulation parameters are specified. The table shows the parameters that must always be present to generate 
-a simulation and the optional ones with possible default values.
-
-| Key word of parameters | Optional |                 Default                  | Description                                                                                                                                            |
-|:-----------------------|:--------:|:----------------------------------------:|:-------------------------------------------------------------------------------------------------------------------------------------------------------|
-| *start_timestamp*      |   True   |              datetime.now()              | Starting date simulation <br/> (%Y-%m-%d %H:%M:%S datetime format).                                                                                    |
-| *duration_simulation*  |   True   |                 365 days                 | Total duration of simulation.                                                                                                                          |
-| *probability*          |   True   | equal probability for each decison point | Three different possible ways to set which path following for decision point (AUTO, float, CUSTOM), for details see the example *decision_mining*.     |
-| *processing_time*      |  False   |                   ----                   | Three different possible ways to set the processing time for each activity (AUTO, DISTRIBUTION, CUSTOM), for details see the example *process times*.  |
-| *waiting_time*         |   True   |                   ----                   | Three different possible ways to set the processing time for each activity (AUTO, DISTRIBUTION, CUSTOM), for details see the example *process times*.  |
-| *interTriggerTimer*    |  False   |                   ----                   | Two different ways to generate the arrivals times of the next tokens in the simulation (DISTRIBUTION, CUSTOM), for details see the example *arrivals*. |
-| *resource*             |  False   |                   ----                   | The list of Roles involved in the simulation, for each of which, individual resources and work schedule are specified (see the example *arrivals*).    |
-| *resource_table*       |  False   |                   ----                   | For each activity, it is defined which role is to perform it.                                                                                          |
-
-
-##### Custom functions
-
-In the file *custom_function.py* it is possible to insert several runtime customizable functions of predictive models to RIMS. 
-The next three examples explain how it is possible to define this integration in a simple and quick way.
-
-## Output files
-
-##### Simulated log
-
-At the end of the simulation, the tool returns the simulated log in [XES](https://www.xes-standard.org/) and CSV format with all the features associated
-with each event, for details see [custom_function](https://francescameneghello.github.io/RIMS_tool/custom_function.html).
-
-All events generated by the simulation are still printed in the terminal view
-
-##### Analysis of simulated log
-
-Class to generate the output json file *result_simulated_log_(experiment_name).json* with some analysis on the simulated log.
-
-|      Name      | Description                                  |
-|:--------------:|:---------------------------------------------|
-|  total_events  | Total events in the log                      |
-|  total_traces  | Total traces in the log                      |
-| *A*_frequency  | Total occurrences of activity *A* in the log |
-| total_duration | Total duration of simulation                 |
-|   start_date   | Start date of the simulation                 |
-|    end_date    | End date of the simulation                   |
-
-If the number of simulations to be run is more than one, RIMS_tool returns the simulated log and analysis file for each simulation.
-
-## Authors
+It is also possible to simulate and optimize your own processes using DRL<sub>HSM</sub>. For specific information on how to implement your own processes, we refer to the [RIMS_Tool documentation](https://francescameneghello.github.io/RIMS_tool/index.html).
 
 
 #### link log BPI17 https://drive.google.com/file/d/1e6y4w8Phnf_D7KpAG5jRi1ZiPFDQ8zRz/view?usp=sharing
