@@ -49,3 +49,6 @@ It is also possible to simulate and optimize your own processes using DRL<sub>HS
 
 
 #### link log BPI17 https://drive.google.com/file/d/1e6y4w8Phnf_D7KpAG5jRi1ZiPFDQ8zRz/view?usp=sharing
+
+
+We acknowledge the support  of the PNRR project FAIR - Future AI Research (PE00000013),  under the NRRP MUR program funded by the NextGenerationEU.
